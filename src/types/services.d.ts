@@ -1,6 +1,4 @@
-export { };
-
-interface ClipboardRecord {
+export interface ClipboardRecord {
   type: "text" | "files" | "image";
   value: string;
   timestamp: number;
