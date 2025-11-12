@@ -1,24 +1,24 @@
 {
-  "name": "demo",
-  "pluginName": "demo",
+  "name": "test",
+  "pluginName": "测试",
   "version": "0.0.1",
-  "description": "这是一个Rubick插件",
+  "description": "测试",
   "main": "index.html",
   "preload": "preload.js",
-  "logo": "https://pic1.zhimg.com/80/v2-c4b9ea27fde09f7e985a5fc77d922680_720w.png",
+  "logo": "https://avatars.githubusercontent.com/u/212650356?v=4",
   "pluginType": "ui",
   "features": [
     {
-      "code": "testing",
-      "explain": "测试插件关键词",
+      "code": "test",
+      "explain": "测试",
       "cmds": [
-        "测试插件",
+        "测试",
         "test"
       ]
     }
   ],
-  "author": "再难也要坚持",
-  "license": "ISC",
+  "author": "lanxiuyun",
+  "license": "MIT",
   "development": "http://localhost:4001",
-  "homePage": "https://gitee.com/rubick-center/rubick-plugin-demo/raw/master/README.md"
+  "homePage": "https://github.com/lanxiuyun/rubick-vue-template"
 }
