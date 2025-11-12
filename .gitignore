@@ -1,3 +1,6 @@
+# 保留 public/node_modules，不要忽略
+!public/node_modules
+
 # Logs
 logs
 *.log
