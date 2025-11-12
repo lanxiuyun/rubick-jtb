@@ -1,14 +1,20 @@
-import './assets/main.css'
+import { createPinia } from "pinia";
+import { createApp } from "vue";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import App from "@/App.vue";
+import router from "@/router";
+// import { onPluginReady } from "@/rubick/init";
 
-import App from './App.vue'
-import router from './router'
+import "@/assets/main.css";
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+// 添加 if 可以兼容浏览器环境
+// 如果当前环境是 Rubick，则初始化 Rubick 相关功能
+if (window?.rubick) {
+  // onPluginReady(app);
+}
 
-app.mount('#app')
+app.use(createPinia());
+app.use(router);
+app.mount("#app");
