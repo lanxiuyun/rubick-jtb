@@ -3,8 +3,10 @@
     <ClipboardTabs @tab-change="handleTabChange" @copy="handleCopy" />
     <ClipboardList :records="filteredRecords" @item-click="handleItemClick" />
 
+    <!-- debug 用 -->
     <!-- <div v-for="record in appStore.records" :key="record.hash">
-      <div>{{ record }}</div>
+        <div>{{ record }}</div>
+      </div> -->
     </div> -->
   </div>
 </template>
