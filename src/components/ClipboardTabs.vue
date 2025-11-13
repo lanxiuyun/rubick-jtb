@@ -1,11 +1,6 @@
 <template>
   <div class="clipboard-tabs">
-    <n-tabs 
-      v-model:value="activeTab" 
-      type="line" 
-      size="small"
-      @update:value="handleTabChange"
-    >
+    <n-tabs v-model:value="appStore.activeTab" type="line" size="small">
       <n-tab-pane
         v-for="tab in tabs"
         :key="tab.key"
@@ -17,17 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from "@/stores/app";
 import type { TabKey } from "@/stores/app";
-import { computed } from "vue";
-import { NTabs, NTabPane } from "naive-ui";
+import { useAppStore } from "@/stores/app";
+import { NTabs } from "naive-ui";
 
-interface Tab {
-  key: TabKey;
-  label: string;
-}
-
-const tabs: Tab[] = [
+const tabs: { key: TabKey; label: string }[] = [
   { key: "all", label: "全部" },
   { key: "text", label: "文本" },
   { key: "files", label: "文件" },
@@ -35,14 +24,6 @@ const tabs: Tab[] = [
 ];
 
 const appStore = useAppStore();
-const activeTab = computed({
-  get: () => appStore.activeTab,
-  set: (value: TabKey) => appStore.setActiveTab(value),
-});
-
-const handleTabChange = (value: TabKey) => {
-  appStore.setActiveTab(value);
-};
 </script>
 
 <style scoped lang="scss">

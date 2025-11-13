@@ -22,9 +22,7 @@ export const useAppStore = defineStore("app-store", {
       const records = await window.services.readAllRecords();
       this.records = records;
     },
-    setActiveTab(tab: TabKey) {
-      this.activeTab = tab;
-    },
+
     addRecord(record: ClipboardRecord) {
       this.records = [record, ...this.records];
     },
