@@ -6,7 +6,7 @@
         :key="record.hash"
         :record="record"
         :index="index + 1"
-        @click="handleItemClick"
+        @click="handleClick(record)"
       />
 
       <n-empty
@@ -20,18 +20,21 @@
 </template>
 
 <script setup lang="ts">
-import type { ClipboardRecord } from "@/types/services";
 import { useAppStore } from "@/stores/app";
-import { NScrollbar, NEmpty } from "naive-ui";
+import type { ClipboardRecord } from "@/types/services";
+import { NEmpty, NScrollbar } from "naive-ui";
 import ClipboardItem from "./ClipboardItem.vue";
 
 const appStore = useAppStore();
 
-const handleItemClick = (record: ClipboardRecord) => {
-  if (record.type === "text") {
-    navigator.clipboard.writeText(record.value as string);
+const handleClick = (record: ClipboardRecord) => {
+  if (appStore.isRubick) {
+    window.services.executeCopy([record]);
+  } else {
+    if (record.type === "text") {
+      navigator.clipboard.writeText(record.value as string);
+    }
   }
-  console.log("点击记录:", record);
 };
 </script>
 

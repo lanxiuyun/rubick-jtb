@@ -1,5 +1,5 @@
 <template>
-  <div class="clipboard-item" @click="handleClick">
+  <div class="clipboard-item">
     <!-- 时间标签 -->
     <div class="item-time">{{ timeLabel }}</div>
 
@@ -59,10 +59,10 @@
 
 <script setup lang="ts">
 import type { ClipboardRecord } from "@/types/services";
-import { truncateText, formatFileSize } from "@/utils/clipboard";
+import { formatFileSize, truncateText } from "@/utils/clipboard";
 import { getRelativeTime } from "@/utils/time";
-import { computed, ref, onMounted } from "vue";
 import { NImage } from "naive-ui";
+import { computed, onMounted, ref } from "vue";
 
 interface Props {
   record: ClipboardRecord;
@@ -70,9 +70,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits<{
-  click: [record: ClipboardRecord];
-}>();
 
 const imageDimensions = ref<string>("");
 
@@ -196,10 +193,6 @@ onMounted(async () => {
     }
   }
 });
-
-const handleClick = () => {
-  emit("click", props.record);
-};
 </script>
 
 <style scoped lang="scss">
