@@ -27,16 +27,6 @@ export function truncateText(text: string, maxLength: number = 100): string {
 }
 
 /**
- * 从文件路径中提取文件名
- * @param path 文件路径
- * @returns 文件名
- */
-export function extractFileName(path: string): string {
-  const parts = path.split(/[/\\]/);
-  return parts[parts.length - 1] || path;
-}
-
-/**
  * 获取图片尺寸信息（异步）
  * @param imagePath 图片路径
  * @returns Promise<{width: number, height: number}>
