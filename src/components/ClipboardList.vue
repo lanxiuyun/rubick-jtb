@@ -2,7 +2,7 @@
   <n-scrollbar class="clipboard-list">
     <div style="padding: 12px">
       <ClipboardItem
-        v-for="(record, index) in records"
+        v-for="(record, index) in appStore.filteredRecords"
         :key="record.hash"
         :record="record"
         :index="index + 1"
@@ -10,7 +10,7 @@
       />
 
       <n-empty
-        v-if="records.length === 0"
+        v-if="appStore.filteredRecords.length === 0"
         description="暂无剪贴板记录"
         size="small"
         style="padding: 40px 0"
@@ -21,20 +21,17 @@
 
 <script setup lang="ts">
 import type { ClipboardRecord } from "@/types/services";
+import { useAppStore } from "@/stores/app";
 import { NScrollbar, NEmpty } from "naive-ui";
 import ClipboardItem from "./ClipboardItem.vue";
 
-interface Props {
-  records: ClipboardRecord[];
-}
-
-defineProps<Props>();
-const emit = defineEmits<{
-  itemClick: [record: ClipboardRecord];
-}>();
+const appStore = useAppStore();
 
 const handleItemClick = (record: ClipboardRecord) => {
-  emit("itemClick", record);
+  if (record.type === "text") {
+    navigator.clipboard.writeText(record.value as string);
+  }
+  console.log("点击记录:", record);
 };
 </script>
 
