@@ -1,4 +1,6 @@
-const records = [
+import type { ClipboardRecord } from "@/types/services";
+
+const records: ClipboardRecord[] = [
   {
     type: "text",
     value: "services",

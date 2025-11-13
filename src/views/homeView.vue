@@ -1,31 +1,27 @@
 <template>
-  <div v-for="record in records" :key="record.hash">
-    <div>{{ record.type }}</div>
+  <div v-for="record in appStore.records" :key="record.hash">
+    <div>{{ record.value }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { use_app_store } from "@/stores/app";
+import { TEST_DATA } from "@/tests/data";
+import { onMounted } from "vue";
 
-interface ClipboardRecord {
-  hash: string;
-  type: "text" | "files" | "image";
-  value: any;
-  timestamp: string;
-}
+const appStore = use_app_store();
+const is_dev = window.rubick ? false : true;
 
-const records = ref<ClipboardRecord[]>([]);
-
-onMounted(async () => {
-  try {
-    records.value = await window.services.readAllRecords();
+if (is_dev) {
+  appStore.records = TEST_DATA.records;
+} else {
+  onMounted(async () => {
+    await appStore.fetchRecords();
 
     // 监听新增记录
     window.services.listenAppendRecord((newRecord) => {
-      records.value = [newRecord, ...records.value];
+      appStore.records = [newRecord, ...appStore.records];
     });
-  } catch (err) {
-    console.error("读取剪贴板历史记录失败", err);
-  }
-});
+  });
+}
 </script>
