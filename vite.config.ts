@@ -13,6 +13,11 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  // 生产环境开启 sourcemap
+  // build: {
+  //   minify: false,
+  //   sourcemap: true,
+  // },
   server: {
     port: 4001,
   },

@@ -16,6 +16,7 @@ export const useAppStore = defineStore("app-store", {
       }
       return state.records.filter((record) => record.type === state.activeTab);
     },
+    isRubick: () => (window.rubick ? true : false),
   },
   actions: {
     async fetchRecords() {
