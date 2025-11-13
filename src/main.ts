@@ -1,5 +1,6 @@
 import { createPinia } from "pinia";
 import { createApp } from "vue";
+import naive from "naive-ui";
 
 import App from "@/App.vue";
 import router from "@/router";
@@ -17,4 +18,5 @@ if (window?.rubick) {
 
 app.use(createPinia());
 app.use(router);
+app.use(naive);
 app.mount("#app");

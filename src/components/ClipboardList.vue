@@ -1,22 +1,27 @@
 <template>
-  <div class="clipboard-list">
-    <ClipboardItem
-      v-for="(record, index) in records"
-      :key="record.hash"
-      :record="record"
-      :index="index + 1"
-      @click="handleItemClick"
-    />
+  <n-scrollbar class="clipboard-list">
+    <div style="padding: 12px">
+      <ClipboardItem
+        v-for="(record, index) in records"
+        :key="record.hash"
+        :record="record"
+        :index="index + 1"
+        @click="handleItemClick"
+      />
 
-    <div v-if="records.length === 0" class="empty-state">
-      <div class="empty-icon">📋</div>
-      <div class="empty-text">暂无剪贴板记录</div>
+      <n-empty
+        v-if="records.length === 0"
+        description="暂无剪贴板记录"
+        size="small"
+        style="padding: 40px 0"
+      />
     </div>
-  </div>
+  </n-scrollbar>
 </template>
 
 <script setup lang="ts">
 import type { ClipboardRecord } from "@/types/services";
+import { NScrollbar, NEmpty } from "naive-ui";
 import ClipboardItem from "./ClipboardItem.vue";
 
 interface Props {
@@ -35,28 +40,7 @@ const handleItemClick = (record: ClipboardRecord) => {
 
 <style scoped lang="scss">
 .clipboard-list {
-  padding: 16px;
+  flex: 1;
   height: 100%;
-  overflow-y: auto;
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    color: #9ca3af;
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
-
-    .empty-text {
-      font-size: 16px;
-    }
-  }
 }
 </style>
-

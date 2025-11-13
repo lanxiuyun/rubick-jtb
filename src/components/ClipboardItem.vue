@@ -1,6 +1,9 @@
 <template>
   <div class="clipboard-item" @click="handleClick">
+    <!-- 时间标签 -->
     <div class="item-time">{{ timeLabel }}</div>
+
+    <!-- 内容区域 -->
     <div class="item-content">
       <!-- 文本类型 -->
       <div v-if="record.type === 'text'" class="text-content">
@@ -9,39 +12,47 @@
 
       <!-- 图片类型 -->
       <div v-else-if="record.type === 'image'" class="image-content">
-        <img :src="imageUrl" class="thumbnail" alt="clipboard image" />
+        <n-image
+          :src="imageUrl"
+          width="80"
+          height="60"
+          object-fit="cover"
+          class="thumbnail"
+        />
         <div class="image-info">
-          <div v-if="fileSize" class="file-size">{{ fileSize }}</div>
-          <div v-if="imageDimensions" class="dimensions">
-            {{ imageDimensions }}
-          </div>
+          <div v-if="fileSize">{{ fileSize }}</div>
+          <div v-if="imageDimensions">{{ imageDimensions }}</div>
         </div>
       </div>
 
       <!-- 文件类型 -->
       <div v-else-if="record.type === 'files'" class="files-content">
+        <!-- 单个文件 -->
         <div v-if="filesInfo.length === 1" class="single-file">
-          <div class="file-icon">{{ filesInfo[0].icon }}</div>
-          <div class="file-details">
+          <span class="file-icon">{{ filesInfo[0].icon }}</span>
+          <div>
             <div class="file-name">{{ filesInfo[0].name }}</div>
             <div class="file-path">{{ filesInfo[0].path }}</div>
           </div>
         </div>
-        <div v-else class="multiple-files">
+
+        <!-- 多个文件 -->
+        <div v-else>
           <div class="files-header">
-            <div class="file-icon">📦</div>
-            <div class="files-count">{{ filesInfo.length }} 个项目</div>
+            <span class="file-icon">📦</span>
+            <span>{{ filesInfo.length }} 个项目</span>
           </div>
           <div class="files-list">
             <div v-for="(file, idx) in filesInfo" :key="idx" class="file-item">
               <span class="file-icon-small">{{ file.icon }}</span>
-              <span class="file-name-small">{{ file.name }}</span>
+              <span>{{ file.name }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- 序号 -->
     <div class="item-index">{{ index }}</div>
   </div>
 </template>
@@ -51,6 +62,7 @@ import type { ClipboardRecord } from "@/types/services";
 import { truncateText, formatFileSize } from "@/utils/clipboard";
 import { getRelativeTime } from "@/utils/time";
 import { computed, ref, onMounted } from "vue";
+import { NImage } from "naive-ui";
 
 interface Props {
   record: ClipboardRecord;
@@ -194,142 +206,98 @@ const handleClick = () => {
 .clipboard-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 12px 16px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 10px;
+  background: #fafafa;
+  border-radius: 4px;
   margin-bottom: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    background: #f0f0f0;
   }
 
   .item-time {
     flex-shrink: 0;
-    width: 80px;
-    font-size: 13px;
-    color: #9ca3af;
-    line-height: 1.4;
+    width: 70px;
+    font-size: 12px;
+    color: #999;
   }
 
   .item-content {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-  }
+    font-size: 13px;
 
-  .text-content {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #374151;
-    word-break: break-word;
-    white-space: pre-wrap;
-  }
-
-  .image-content {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-
-    .thumbnail {
-      width: 120px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #e5e7eb;
-      flex-shrink: 0;
+    .text-content {
+      line-height: 1.5;
+      color: #333;
+      word-break: break-word;
     }
 
-    .image-info {
+    .image-content {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 13px;
-      color: #6b7280;
+      gap: 10px;
 
-      .file-size,
-      .dimensions {
-        line-height: 1.4;
+      .thumbnail {
+        border-radius: 4px;
+      }
+
+      .image-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+        color: #666;
       }
     }
-  }
 
-  .files-content {
-    width: 100%;
+    .files-content {
+      .single-file {
+        display: flex;
+        gap: 8px;
 
-    .single-file {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-
-      .file-icon {
-        font-size: 24px;
-        flex-shrink: 0;
-      }
-
-      .file-details {
-        flex: 1;
-        min-width: 0;
+        .file-icon {
+          font-size: 20px;
+        }
 
         .file-name {
-          font-size: 14px;
-          color: #374151;
-          word-break: break-word;
-          margin-bottom: 4px;
-          font-weight: 500;
+          color: #333;
+          margin-bottom: 2px;
         }
 
         .file-path {
-          font-size: 12px;
-          color: #9ca3af;
+          font-size: 11px;
+          color: #999;
           word-break: break-all;
         }
       }
-    }
 
-    .multiple-files {
       .files-header {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
 
         .file-icon {
-          font-size: 24px;
-        }
-
-        .files-count {
-          font-size: 14px;
-          color: #374151;
-          font-weight: 500;
+          font-size: 20px;
         }
       }
 
       .files-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        padding-left: 32px;
+        padding-left: 28px;
 
         .file-item {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 13px;
-          color: #6b7280;
+          margin-bottom: 4px;
+          font-size: 12px;
+          color: #666;
 
           .file-icon-small {
-            font-size: 16px;
-            flex-shrink: 0;
-          }
-
-          .file-name-small {
-            word-break: break-word;
+            font-size: 14px;
           }
         }
       }
@@ -338,11 +306,9 @@ const handleClick = () => {
 
   .item-index {
     flex-shrink: 0;
-    margin-left: 16px;
-    font-size: 16px;
-    font-weight: 500;
-    color: #9ca3af;
-    min-width: 24px;
+    font-size: 14px;
+    color: #999;
+    min-width: 20px;
     text-align: right;
   }
 }
