@@ -5,8 +5,7 @@
 
     <!-- debug 用 -->
     <!-- <div v-for="record in appStore.records" :key="record.hash">
-        <div>{{ record }}</div>
-      </div> -->
+      <div>{{ record }}</div>
     </div> -->
   </div>
 </template>
