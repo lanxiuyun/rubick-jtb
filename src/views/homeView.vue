@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { use_app_store } from "@/stores/app";
+import { useAppStore } from "@/stores/app";
 import { TEST_DATA } from "@/tests/data";
 import { computed, onMounted, ref } from "vue";
 import type { ClipboardRecord } from "@/types/services";
@@ -19,7 +19,7 @@ import ClipboardList from "@/components/ClipboardList.vue";
 
 type TabKey = "all" | "text" | "files" | "image";
 
-const appStore = use_app_store();
+const appStore = useAppStore();
 const is_dev = window.rubick ? false : true;
 const activeTab = ref<TabKey>("all");
 

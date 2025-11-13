@@ -1,7 +1,7 @@
 import type { ClipboardRecord } from "@/types/services";
 import { defineStore } from "pinia";
 
-export const use_app_store = defineStore("app-store", {
+export const useAppStore = defineStore("app-store", {
   state: () => ({
     records: [] as ClipboardRecord[],
   }),
