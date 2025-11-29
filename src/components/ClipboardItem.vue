@@ -50,7 +50,7 @@
       >
         <template #icon>
           <n-icon :size="20" :color="isFavorite ? '#fadb14' : '#d9d9d9'">
-            <component :is="isFavorite ? StarFilled : StarOutline" />
+            <StarOutline :theme="isFavorite ? 'filled' : 'outline'" :fill="isFavorite ? ['#fadb14'] : ['currentColor']" />
           </n-icon>
         </template>
       </n-button>
@@ -69,7 +69,6 @@ import {
   DocumentAttachOutline,
   ImageOutline,
   StarOutline,
-  StarFilled,
 } from "@/utils/icons";
 import { getRelativeTime } from "@/utils/time";
 import { NButton, NIcon, NImage } from "naive-ui";
