@@ -19,6 +19,11 @@
 
       <!-- 文件类型 -->
       <div v-else class="file-block">
+        <!-- 单个图片文件额外显示预览 -->
+        <div v-if="isSingleImageFile" class="image-block">
+          <n-image :src="singleImageUrl" height="120" width="120" object-fit="cover" />
+        </div>
+        <!-- 文件列表 -->
         <div
           v-for="(file, idx) in displayedFiles"
           :key="`${file.path}-${idx}`"
@@ -154,6 +159,27 @@ const displayedFiles = computed(() => {
 const toggleShowAll = () => {
   showAllFiles.value = !showAllFiles.value;
 };
+
+// ===== 单个图片文件预览相关 =====
+const isSingleImageFile = computed(() => {
+  if (props.record.type !== "files") return false;
+  
+  const files = props.record.value as FileInfo[];
+  if (files.length !== 1) return false;
+  
+  const file = files[0];
+  if (!file.isFile) return false;
+  
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  return IMAGE_EXTENSIONS.has(ext);
+});
+
+const singleImageUrl = computed(() => {
+  if (!isSingleImageFile.value) return "";
+  
+  const files = props.record.value as FileInfo[];
+  return `file:///${files[0].path}`;
+});
 </script>
 
 <style scoped lang="scss">
