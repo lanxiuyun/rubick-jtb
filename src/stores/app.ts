@@ -1,5 +1,6 @@
 import RUBICK_DB from "@/rubick/db";
 import type { ClipboardRecord } from "@/types/services";
+import { matchText } from "@/utils/pinyin";
 import { defineStore } from "pinia";
 
 export type TabKey = "all" | "text" | "files" | "image";
@@ -24,25 +25,24 @@ export const useAppStore = defineStore("app-store", {
         );
       }
 
-      // 根据搜索文本筛选
+      // 根据搜索文本筛选（支持中文拼音和首字母匹配）
       if (state.textSearch) {
-        const textSearchLower = state.textSearch.toLowerCase();
+        const keyword = state.textSearch;
         filteredRecords = filteredRecords.filter((record) => {
-          // 文本类型：直接搜索 value
+          // 文本类型：搜索 value（支持拼音）
           if (record.type === "text" && typeof record.value === "string") {
-            return record.value.toLowerCase().includes(textSearchLower);
+            return matchText(record.value, keyword);
           }
-          // 文件类型：搜索文件名和路径
+          // 文件类型：搜索文件名和路径（支持拼音）
           if (record.type === "files" && Array.isArray(record.value)) {
             return record.value.some(
               (file) =>
-                file.name.toLowerCase().includes(textSearchLower) ||
-                file.path.toLowerCase().includes(textSearchLower)
+                matchText(file.name, keyword) || matchText(file.path, keyword)
             );
           }
-          // 图片类型：搜索路径
+          // 图片类型：搜索路径（支持拼音）
           if (record.type === "image" && typeof record.value === "string") {
-            return record.value.toLowerCase().includes(textSearchLower);
+            return matchText(record.value, keyword);
           }
           return false;
         });

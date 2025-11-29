@@ -20,7 +20,7 @@ const onSearchTextChange = () => {
   window.rubick.setSubInput(({ text }: { text: string }) => {
     const appStore = useAppStore();
     appStore.textSearch = text;
-  });
+  }, "搜索~ 支持拼音/首字母");
 };
 
 const RUBICK_INIT = {
