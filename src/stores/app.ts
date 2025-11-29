@@ -8,14 +8,47 @@ export const useAppStore = defineStore("app-store", {
   state: () => ({
     records: [] as ClipboardRecord[],
     activeTab: "all" as TabKey,
+
+    // 用户输入
+    textSearch: "" as string,
   }),
   getters: {
     // 根据当前 tab 筛选记录
     filteredRecords(state): ClipboardRecord[] {
-      if (state.activeTab === "all") {
-        return state.records;
+      let filteredRecords = state.records;
+
+      // 根据 tab 筛选
+      if (state.activeTab !== "all") {
+        filteredRecords = filteredRecords.filter(
+          (record) => record.type === state.activeTab
+        );
       }
-      return state.records.filter((record) => record.type === state.activeTab);
+
+      // 根据搜索文本筛选
+      if (state.textSearch) {
+        const textSearchLower = state.textSearch.toLowerCase();
+        filteredRecords = filteredRecords.filter((record) => {
+          // 文本类型：直接搜索 value
+          if (record.type === "text" && typeof record.value === "string") {
+            return record.value.toLowerCase().includes(textSearchLower);
+          }
+          // 文件类型：搜索文件名和路径
+          if (record.type === "files" && Array.isArray(record.value)) {
+            return record.value.some(
+              (file) =>
+                file.name.toLowerCase().includes(textSearchLower) ||
+                file.path.toLowerCase().includes(textSearchLower)
+            );
+          }
+          // 图片类型：搜索路径
+          if (record.type === "image" && typeof record.value === "string") {
+            return record.value.toLowerCase().includes(textSearchLower);
+          }
+          return false;
+        });
+      }
+
+      return filteredRecords;
     },
   },
   actions: {
