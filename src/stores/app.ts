@@ -1,4 +1,4 @@
-import DB_API from "@/rubick/db";
+import RUBICK_DB from "@/rubick/db";
 import type { ClipboardRecord } from "@/types/services";
 import { defineStore } from "pinia";
 
@@ -20,7 +20,7 @@ export const useAppStore = defineStore("app-store", {
   },
   actions: {
     async fetchRecords() {
-      this.records = await DB_API.getClipboardData();
+      this.records = await RUBICK_DB.getClipboardData();
     },
 
     async addRecord(record: ClipboardRecord) {
@@ -39,7 +39,7 @@ export const useAppStore = defineStore("app-store", {
       this.records = this.records.slice(0, 2000);
 
       // 更新数据库（添加 await 确保数据同步完成）
-      await DB_API.setClipboardData(this.records);
+      await RUBICK_DB.setClipboardData(this.records);
     },
   },
 });

@@ -54,9 +54,9 @@ const setClipboardData = async (data: ClipboardRecord[]): Promise<void> => {
   }
 };
 
-const DB_API = {
+const RUBICK_DB = {
   getClipboardData,
   setClipboardData,
 };
 
-export default DB_API;
+export default RUBICK_DB;
