@@ -54,4 +54,9 @@ const setClipboardData = async (data: ClipboardRecord[]): Promise<void> => {
   }
 };
 
-export { getClipboardData, setClipboardData };
+const clipboardDb = {
+  getClipboardData,
+  setClipboardData,
+};
+
+export default clipboardDb;
