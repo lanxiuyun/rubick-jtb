@@ -26,6 +26,28 @@ const createIcon = (d: string) =>
     },
   });
 
+const createFilledIcon = (d: string) =>
+  defineComponent({
+    name: "SvgFilledIcon",
+    render() {
+      return h(
+        "svg",
+        {
+          xmlns: "http://www.w3.org/2000/svg",
+          viewBox: "0 0 512 512",
+          width: "1em",
+          height: "1em",
+        },
+        [
+          h("path", {
+            d,
+            fill: "currentColor",
+          }),
+        ]
+      );
+    },
+  });
+
 export const AppsOutline = createIcon(
   "M104 104h56v56h-56zM104 232h56v56h-56zM104 360h56v56h-56zM232 104h56v56h-56zM232 232h56v56h-56zM232 360h56v56h-56zM360 104h56v56h-56zM360 232h56v56h-56zM360 360h56v56h-56z"
 );
@@ -46,5 +68,13 @@ export const CopyOutline = createIcon(
 
 export const TrashOutline = createIcon(
   "M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320"
+);
+
+export const StarOutline = createIcon(
+  "M480 208H308L256 48l-52 160H32l140 96-54 160 138-100 138 100-54-160z"
+);
+
+export const StarFilled = createFilledIcon(
+  "M394 480a16 16 0 01-9.39-3L256 383.76 127.39 477a16 16 0 01-24.55-18.08L153 310.35 23 221.2a16 16 0 019-29.2h160.38l48.4-148.95a16 16 0 0130.44 0l48.4 149H480a16 16 0 019.05 29.2L359 310.35l50.13 148.53A16 16 0 01394 480z"
 );
 

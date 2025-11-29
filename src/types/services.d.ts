@@ -11,6 +11,7 @@ export interface ClipboardRecord {
   size?: number;
   timestamp: number;
   hash: string;
+  favorite?: boolean; // 是否收藏
 }
 
 declare global {

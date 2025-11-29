@@ -40,20 +40,39 @@
       </div>
     </div>
 
+    <div class="item-actions" :class="{ 'is-favorite': isFavorite }">
+      <n-button
+        text
+        circle
+        size="small"
+        class="favorite-btn"
+        @click.stop="handleToggleFavorite"
+      >
+        <template #icon>
+          <n-icon :size="20" :color="isFavorite ? '#fadb14' : '#d9d9d9'">
+            <component :is="isFavorite ? StarFilled : StarOutline" />
+          </n-icon>
+        </template>
+      </n-button>
+    </div>
+
     <div class="item-index">{{ index }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { ClipboardRecord, FileInfo } from "@/types/services";
+import useAppStore from "@/stores/app";
 import { formatFileSize, truncateText } from "@/utils/clipboard";
 import {
   AppsOutline,
   DocumentAttachOutline,
   ImageOutline,
+  StarOutline,
+  StarFilled,
 } from "@/utils/icons";
 import { getRelativeTime } from "@/utils/time";
-import { NIcon, NImage } from "naive-ui";
+import { NButton, NIcon, NImage } from "naive-ui";
 import type { Component } from "vue";
 import { computed, ref, watch } from "vue";
 
@@ -67,7 +86,16 @@ const props = defineProps<{
   index: number;
 }>();
 
+const appStore = useAppStore();
+
 const timeLabel = computed(() => getRelativeTime(props.record.timestamp));
+
+// ===== 收藏相关 =====
+const isFavorite = computed(() => !!props.record.favorite);
+
+const handleToggleFavorite = async () => {
+  await appStore.toggleFavorite(props.record.hash);
+};
 
 // ===== 文本类型相关 =====
 const displayText = computed(() =>
@@ -208,6 +236,10 @@ const singleImageUrl = computed(() => {
       font-weight: 600;
       transform: scale(1.1);
     }
+
+    .item-actions {
+      opacity: 1;
+    }
   }
 }
 
@@ -224,6 +256,32 @@ const singleImageUrl = computed(() => {
   flex: 1;
   padding-right: 16px;
   min-width: 0;
+}
+
+.item-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-right: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  // 已收藏的项目始终显示星星
+  &.is-favorite {
+    opacity: 1;
+  }
+
+  .favorite-btn {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
 }
 
 .item-index {
