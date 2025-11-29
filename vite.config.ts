@@ -1,0 +1,24 @@
+import { fileURLToPath, URL } from "node:url";
+
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite";
+import vueDevTools from "vite-plugin-vue-devtools";
+
+// https://vite.dev/config/
+export default defineConfig({
+  base: "./", // rubick 插件需要设置相对目录才能启动
+  plugins: [vue(), vueDevTools()],
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+    },
+  },
+  // 生产环境开启 sourcemap
+  // build: {
+  //   minify: false,
+  //   sourcemap: true,
+  // },
+  server: {
+    port: 4001,
+  },
+});

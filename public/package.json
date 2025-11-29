@@ -1,0 +1,34 @@
+{
+  "name": "lanxiuyun-clipboard",
+  "pluginName": "剪贴板",
+  "version": "0.0.1",
+  "description": "剪贴板",
+  "logo": "https://aisearch.cdn.bcebos.com/homepage/dashboard/ai_write/report.png",
+  "features": [
+    {
+      "code": "clipboard",
+      "explain": "剪贴板",
+      "cmds": [
+        "剪贴板",
+        "剪切板",
+        "clip",
+        "qtb",
+        "Clipboard"
+      ]
+    }
+  ],
+  "development": "http://localhost:4001",
+  "homePage": "https://github.com/lanxiuyun/rubick-jtb",
+
+  "author": "lanxiuyun",
+  "license": "MIT",
+  "main": "index.html",
+  "preload": "preload.js",
+  "pluginType": "system",
+  "entry": "main.js",
+  "dependencies": {
+    "original-fs": "^1.2.0",
+    "png2ico": "^0.4.1",
+    "rimraf": "3.0.2"
+  }
+}

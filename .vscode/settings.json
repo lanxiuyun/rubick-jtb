@@ -1,0 +1,13 @@
+{
+  "achilleshr.runonsave": {
+    "message": "*** start build ***",
+    "messageAfter": "*** build Complete ***",
+    "commands": [
+      {
+        "match": ".*\\.(ts|vue|js|json)$",
+        "cmd": "pnpm build",
+        "isAsync": true
+      }
+    ]
+  }
+}
