@@ -26,7 +26,6 @@ const lanxiuyun_clipboard_key = "lanxiuyun_clipboard";
 const getClipboardData = async (): Promise<ClipboardRecord[]> => {
   try {
     const data = await window.rubick.db.get(lanxiuyun_clipboard_key);
-    debugger
     return JSON.parse(data.data) as ClipboardRecord[];
   } catch (error) {
     return [];
