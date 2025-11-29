@@ -101,6 +101,30 @@ export const useAppStore = defineStore("app-store", {
         await RUBICK_DB.setClipboardData(this.records);
       }
     },
+
+    // 手动创建并收藏记录
+    async createFavoriteRecord(data: {
+      type: "text" | "files";
+      value: string | any;
+    }) {
+      // 生成简单的 hash（基于内容和时间戳）
+      const content = JSON.stringify(data.value);
+      const hash = `manual_${Date.now()}_${content.substring(0, 20)}`;
+      
+      const newRecord: ClipboardRecord = {
+        type: data.type,
+        value: data.value,
+        timestamp: Date.now(),
+        hash,
+        favorite: true, // 手动添加的默认收藏
+      };
+
+      // 添加到记录列表头部
+      this.records = [newRecord, ...this.records];
+      
+      // 持久化到数据库
+      await RUBICK_DB.setClipboardData(this.records);
+    },
   },
 });
 

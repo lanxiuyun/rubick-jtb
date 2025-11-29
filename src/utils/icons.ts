@@ -8,4 +8,5 @@ export {
   Delete as TrashOutline,
   Star as StarOutline,
   StarOne as StarFilled,
+  Plus as AddOutline,
 } from '@icon-park/vue-next';

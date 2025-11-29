@@ -18,33 +18,44 @@
     </div>
   </n-scrollbar>
 
+  <!-- 添加常用数据按钮（仅在收藏标签页显示） -->
   <n-button
+    v-if="isFavoriteTab"
     circle
     size="large"
+    type="primary"
     class="float-btn"
-    secondary
-    :disabled="!hasRecords"
-    @click="handleClear"
+    @click="showAddModal = true"
   >
     <template #icon>
-      <n-icon color="#666">
-        <TrashOutline />
+      <n-icon>
+        <AddOutline />
       </n-icon>
     </template>
   </n-button>
+
+  <!-- 添加常用数据弹窗 -->
+  <AddFavoriteModal
+    v-model:show="showAddModal"
+    @submit="handleAddFavorite"
+  />
 </template>
 
 <script setup lang="ts">
 import useAppStore from "@/stores/app";
 import type { ClipboardRecord } from "@/types/services";
-import { TrashOutline } from "@/utils/icons";
+import { AddOutline } from "@/utils/icons";
 import { NButton, NEmpty, NIcon, NScrollbar } from "naive-ui";
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import AddFavoriteModal from "./AddFavoriteModal.vue";
 import ClipboardItem from "./ClipboardItem.vue";
 
 const appStore = useAppStore();
 const records = computed(() => appStore.filteredRecords);
 const hasRecords = computed(() => records.value.length > 0);
+const isFavoriteTab = computed(() => appStore.activeTab === "favorite");
+
+const showAddModal = ref(false);
 
 const handleClickItem = async (record: ClipboardRecord) => {
   if (window.rubick) {
@@ -61,8 +72,11 @@ const handleClickItem = async (record: ClipboardRecord) => {
   }
 };
 
-const handleClear = async () => {
-  console.log("clear");
+const handleAddFavorite = async (data: {
+  type: "text" | "files";
+  value: string | any;
+}) => {
+  await appStore.createFavoriteRecord(data);
 };
 </script>
 
