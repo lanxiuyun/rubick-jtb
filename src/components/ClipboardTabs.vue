@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import type { TabKey } from "@/stores/app";
-import { useAppStore } from "@/stores/app";
+import useAppStore from "@/stores/app";
 import {
   AppsOutline,
   DocumentAttachOutline,

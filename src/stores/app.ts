@@ -43,3 +43,5 @@ export const useAppStore = defineStore("app-store", {
     },
   },
 });
+
+export default useAppStore;

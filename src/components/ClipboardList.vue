@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from "@/stores/app";
+import useAppStore from "@/stores/app";
 import type { ClipboardRecord } from "@/types/services";
 import { TrashOutline } from "@/utils/icons";
 import { NButton, NEmpty, NIcon, NScrollbar } from "naive-ui";

@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import ClipboardList from "@/components/ClipboardList.vue";
 import ClipboardTabs from "@/components/ClipboardTabs.vue";
-import { useAppStore } from "@/stores/app";
+import useAppStore from "@/stores/app";
 import { TEST_DATA } from "@/tests/data";
 import { onMounted } from "vue";
 
