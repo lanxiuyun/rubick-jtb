@@ -2,7 +2,7 @@
 export { 
   AllApplication as AppsOutline,
   TextMessage as TextOutline,
-  FileText as DocumentAttachOutline,
+  Notes as DocumentAttachOutline,
   Pic as ImageOutline,
   Copy as CopyOutline,
   Delete as TrashOutline,
