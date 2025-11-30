@@ -5,7 +5,13 @@
     <div class="item-content">
       <!-- 图片类型 -->
       <div v-if="record.type === 'image'" class="image-block">
-        <n-image :src="imageUrl" height="120" width="120" object-fit="cover" />
+        <n-image
+          :src="imageUrl"
+          height="120"
+          width="120"
+          object-fit="cover"
+          @click.stop
+        />
         <div v-if="fileSize || imageDimensions" class="meta-info">
           <span v-if="fileSize">{{ fileSize }}</span>
           <span v-if="imageDimensions">{{ imageDimensions }}</span>
@@ -20,8 +26,13 @@
       <!-- 文件类型 -->
       <div v-else class="file-block">
         <!-- 单个图片文件额外显示预览 -->
-        <div v-if="isSingleImageFile" class="image-block">
-          <n-image :src="singleImageUrl" height="120" width="120" object-fit="cover" />
+        <div v-if="isSingleImageFile" class="image-block" @click.stop>
+          <n-image
+            :src="singleImageUrl"
+            height="120"
+            width="120"
+            object-fit="cover"
+          />
         </div>
         <!-- 文件列表 -->
         <div
@@ -50,7 +61,10 @@
       >
         <template #icon>
           <n-icon :size="20" :color="isFavorite ? '#fadb14' : '#d9d9d9'">
-            <StarOutline :theme="isFavorite ? 'filled' : 'outline'" :fill="isFavorite ? ['#fadb14'] : ['currentColor']" />
+            <StarOutline
+              :theme="isFavorite ? 'filled' : 'outline'"
+              :fill="isFavorite ? ['#fadb14'] : ['currentColor']"
+            />
           </n-icon>
         </template>
       </n-button>
@@ -61,8 +75,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ClipboardRecord, FileInfo } from "@/types/services";
 import useAppStore from "@/stores/app";
+import type { ClipboardRecord, FileInfo } from "@/types/services";
 import { formatFileSize, truncateText } from "@/utils/clipboard";
 import {
   AppsOutline,
@@ -190,20 +204,20 @@ const toggleShowAll = () => {
 // ===== 单个图片文件预览相关 =====
 const isSingleImageFile = computed(() => {
   if (props.record.type !== "files") return false;
-  
+
   const files = props.record.value as FileInfo[];
   if (files.length !== 1) return false;
-  
+
   const file = files[0];
   if (!file.isFile) return false;
-  
+
   const ext = file.name.split(".").pop()?.toLowerCase() || "";
   return IMAGE_EXTENSIONS.has(ext);
 });
 
 const singleImageUrl = computed(() => {
   if (!isSingleImageFile.value) return "";
-  
+
   const files = props.record.value as FileInfo[];
   return `file:///${files[0].path}`;
 });
