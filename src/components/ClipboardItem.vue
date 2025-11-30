@@ -5,13 +5,14 @@
     <div class="item-content">
       <!-- 图片类型 -->
       <div v-if="record.type === 'image'" class="image-block">
-        <n-image
-          :src="imageUrl"
-          height="120"
-          width="120"
-          object-fit="cover"
-          @click.stop
-        />
+        <div class="image-preview" @click.stop>
+          <n-image
+            :src="imageUrl"
+            height="120"
+            width="120"
+            object-fit="cover"
+          />
+        </div>
         <div v-if="fileSize || imageDimensions" class="meta-info">
           <span v-if="fileSize">{{ fileSize }}</span>
           <span v-if="imageDimensions">{{ imageDimensions }}</span>
@@ -26,13 +27,15 @@
       <!-- 文件类型 -->
       <div v-else class="file-block">
         <!-- 单个图片文件额外显示预览 -->
-        <div v-if="isSingleImageFile" class="image-block" @click.stop>
-          <n-image
-            :src="singleImageUrl"
-            height="120"
-            width="120"
-            object-fit="cover"
-          />
+        <div v-if="isSingleImageFile" class="image-block">
+          <div class="image-preview" @click.stop>
+            <n-image
+              :src="singleImageUrl"
+              height="120"
+              width="120"
+              object-fit="cover"
+            />
+          </div>
         </div>
         <!-- 文件列表 -->
         <div
@@ -312,6 +315,11 @@ const singleImageUrl = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.image-preview {
+  width: fit-content;
+  cursor: pointer;
 }
 
 .meta-info {
