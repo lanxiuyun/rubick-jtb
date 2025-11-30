@@ -104,24 +104,56 @@ export const useAppStore = defineStore("app-store", {
 
     // 手动创建并收藏记录
     async createFavoriteRecord(data: {
-      type: "text" | "files";
+      type: "text" | "image" | "files";
       value: string | any;
     }) {
-      // 生成简单的 hash（基于内容和时间戳）
-      const content = JSON.stringify(data.value);
-      const hash = `manual_${Date.now()}_${content.substring(0, 20)}`;
-      
-      const newRecord: ClipboardRecord = {
-        type: data.type,
-        value: data.value,
-        timestamp: Date.now(),
-        hash,
-        favorite: true, // 手动添加的默认收藏
-      };
+      let hash: string;
+      let recordData: ClipboardRecord;
+
+      if (data.type === "image") {
+        // 如果是图片类型,需要调用主进程保存图片并获取路径
+        if (window.rubick && window.services) {
+          try {
+            const imagePath = await window.services.saveClipboardImage(data.value);
+            hash = `manual_image_${Date.now()}`;
+            recordData = {
+              type: "image",
+              value: imagePath,
+              timestamp: Date.now(),
+              hash,
+              favorite: true,
+            };
+          } catch (error) {
+            console.error("保存图片失败", error);
+            throw error;
+          }
+        } else {
+          // 浏览器环境，直接使用 data URL
+          hash = `manual_image_${Date.now()}`;
+          recordData = {
+            type: "image",
+            value: data.value,
+            timestamp: Date.now(),
+            hash,
+            favorite: true,
+          };
+        }
+      } else {
+        // 文本或文件类型
+        const content = JSON.stringify(data.value);
+        hash = `manual_${Date.now()}_${content.substring(0, 20)}`;
+        recordData = {
+          type: data.type as "text" | "files",
+          value: data.value,
+          timestamp: Date.now(),
+          hash,
+          favorite: true,
+        };
+      }
 
       // 添加到记录列表头部
-      this.records = [newRecord, ...this.records];
-      
+      this.records = [recordData, ...this.records];
+
       // 持久化到数据库
       await RUBICK_DB.setClipboardData(this.records);
     },

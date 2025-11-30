@@ -73,7 +73,7 @@ const handleClickItem = async (record: ClipboardRecord) => {
 };
 
 const handleAddFavorite = async (data: {
-  type: "text" | "files";
+  type: "text" | "image" | "files";
   value: string | any;
 }) => {
   await appStore.createFavoriteRecord(data);

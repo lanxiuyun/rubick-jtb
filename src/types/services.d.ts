@@ -24,6 +24,7 @@ declare global {
       filesExists: (paths: string[]) => boolean[];
       executeCopy: (items: ClipboardRecord[]) => void;
       dragToFiles: (items: ClipboardRecord[]) => void;
+      saveClipboardImage: (imageDataUrl: string) => Promise<string>;
     };
   }
 }
