@@ -185,6 +185,39 @@ module.exports = () => {
             n.icon = nativeImage.createFromBuffer(i), e.sender.startDrag(n)
           }))
         }
+        
+        // 保存用户手动添加的图片
+        saveClipboardImage(event, imageDataUrl) {
+          try {
+            // 去掉 data:image/png;base64, 前缀
+            const base64Data = imageDataUrl.replace(/^data:image\/\w+;base64,/, '');
+            const buffer = Buffer.from(base64Data, 'base64');
+            
+            // 创建 hash
+            const hash = crypto.createHash("md5").update(buffer).digest("hex");
+            
+            // 初始化当前记录文件状态
+            !this.currentRecordFileStat && this.initCurrentRecordFileStat();
+            
+            // 创建记录对象
+            const target = {
+              type: "image",
+              size: buffer.length,
+              timestamp: Date.now(),
+              buffer: buffer,
+              hash: hash,
+            };
+            
+            // 添加记录
+            this.appendRecordItem(target);
+            
+            // 返回路径
+            return path.join(this.currentRecordFileStat.folder, hash);
+          } catch (error) {
+            console.error('保存图片失败:', error);
+            throw error;
+          }
+        }
       }
   
       const clipboardWatch = new ClipboardWatcher();
@@ -192,7 +225,7 @@ module.exports = () => {
       ipcMain.handle("clipboard.services", (async (t, n, ...o) => {
         const r = clipboardWatch[n];
         if ("function" != typeof r) throw new Error("未知接口");
-        return r(t, ...o);
+        return r.call(clipboardWatch, t, ...o);
       }))
       const watcher = clipboardWatcher(clipboard, {
         // (optional) delay in ms between polls

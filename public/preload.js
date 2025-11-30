@@ -75,5 +75,8 @@ window.services = {
     const t = convertDragFiles(e);
     0 !== t.length && ipcInvoke("startDrag", t)
   },
+  saveClipboardImage: async (imageDataUrl) => {
+    return await ipcInvoke("saveClipboardImage", imageDataUrl);
+  },
 };
 

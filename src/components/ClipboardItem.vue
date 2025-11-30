@@ -5,7 +5,14 @@
     <div class="item-content">
       <!-- 图片类型 -->
       <div v-if="record.type === 'image'" class="image-block">
-        <n-image :src="imageUrl" height="120" width="120" object-fit="cover" />
+        <div class="image-preview" @click.stop>
+          <n-image
+            :src="imageUrl"
+            height="120"
+            width="120"
+            object-fit="cover"
+          />
+        </div>
         <div v-if="fileSize || imageDimensions" class="meta-info">
           <span v-if="fileSize">{{ fileSize }}</span>
           <span v-if="imageDimensions">{{ imageDimensions }}</span>
@@ -19,6 +26,18 @@
 
       <!-- 文件类型 -->
       <div v-else class="file-block">
+        <!-- 单个图片文件额外显示预览 -->
+        <div v-if="isSingleImageFile" class="image-block">
+          <div class="image-preview" @click.stop>
+            <n-image
+              :src="singleImageUrl"
+              height="120"
+              width="120"
+              object-fit="cover"
+            />
+          </div>
+        </div>
+        <!-- 文件列表 -->
         <div
           v-for="(file, idx) in displayedFiles"
           :key="`${file.path}-${idx}`"
@@ -35,20 +54,41 @@
       </div>
     </div>
 
+    <div class="item-actions" :class="{ 'is-favorite': isFavorite }">
+      <n-button
+        text
+        circle
+        size="small"
+        class="favorite-btn"
+        @click.stop="handleToggleFavorite"
+      >
+        <template #icon>
+          <n-icon :size="20" :color="isFavorite ? '#fadb14' : '#d9d9d9'">
+            <StarOutline
+              :theme="isFavorite ? 'filled' : 'outline'"
+              :fill="isFavorite ? ['#fadb14'] : ['currentColor']"
+            />
+          </n-icon>
+        </template>
+      </n-button>
+    </div>
+
     <div class="item-index">{{ index }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
+import useAppStore from "@/stores/app";
 import type { ClipboardRecord, FileInfo } from "@/types/services";
 import { formatFileSize, truncateText } from "@/utils/clipboard";
 import {
   AppsOutline,
   DocumentAttachOutline,
   ImageOutline,
+  StarOutline,
 } from "@/utils/icons";
 import { getRelativeTime } from "@/utils/time";
-import { NIcon, NImage } from "naive-ui";
+import { NButton, NIcon, NImage } from "naive-ui";
 import type { Component } from "vue";
 import { computed, ref, watch } from "vue";
 
@@ -62,7 +102,16 @@ const props = defineProps<{
   index: number;
 }>();
 
+const appStore = useAppStore();
+
 const timeLabel = computed(() => getRelativeTime(props.record.timestamp));
+
+// ===== 收藏相关 =====
+const isFavorite = computed(() => !!props.record.favorite);
+
+const handleToggleFavorite = async () => {
+  await appStore.toggleFavorite(props.record.hash);
+};
 
 // ===== 文本类型相关 =====
 const displayText = computed(() =>
@@ -154,6 +203,27 @@ const displayedFiles = computed(() => {
 const toggleShowAll = () => {
   showAllFiles.value = !showAllFiles.value;
 };
+
+// ===== 单个图片文件预览相关 =====
+const isSingleImageFile = computed(() => {
+  if (props.record.type !== "files") return false;
+
+  const files = props.record.value as FileInfo[];
+  if (files.length !== 1) return false;
+
+  const file = files[0];
+  if (!file.isFile) return false;
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  return IMAGE_EXTENSIONS.has(ext);
+});
+
+const singleImageUrl = computed(() => {
+  if (!isSingleImageFile.value) return "";
+
+  const files = props.record.value as FileInfo[];
+  return `file:///${files[0].path}`;
+});
 </script>
 
 <style scoped lang="scss">
@@ -182,6 +252,10 @@ const toggleShowAll = () => {
       font-weight: 600;
       transform: scale(1.1);
     }
+
+    .item-actions {
+      opacity: 1;
+    }
   }
 }
 
@@ -200,6 +274,32 @@ const toggleShowAll = () => {
   min-width: 0;
 }
 
+.item-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-right: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  // 已收藏的项目始终显示星星
+  &.is-favorite {
+    opacity: 1;
+  }
+
+  .favorite-btn {
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}
+
 .item-index {
   width: 30px;
   text-align: right;
@@ -215,6 +315,11 @@ const toggleShowAll = () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.image-preview {
+  width: fit-content;
+  cursor: pointer;
 }
 
 .meta-info {

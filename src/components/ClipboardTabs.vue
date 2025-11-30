@@ -22,11 +22,12 @@
 
 <script setup lang="ts">
 import type { TabKey } from "@/stores/app";
-import { useAppStore } from "@/stores/app";
+import useAppStore from "@/stores/app";
 import {
   AppsOutline,
   DocumentAttachOutline,
   ImageOutline,
+  StarOutline,
   TextOutline,
 } from "@/utils/icons";
 import { NButton, NIcon, NSpace } from "naive-ui";
@@ -34,6 +35,7 @@ import type { Component } from "vue";
 
 const tabs: { key: TabKey; label: string; icon: Component }[] = [
   { key: "all", label: "全部", icon: AppsOutline },
+  { key: "favorite", label: "收藏", icon: StarOutline },
   { key: "text", label: "文本", icon: TextOutline },
   { key: "files", label: "文件", icon: DocumentAttachOutline },
   { key: "image", label: "图片", icon: ImageOutline },

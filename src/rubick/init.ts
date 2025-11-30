@@ -1,17 +1,31 @@
-import type { App } from "vue";
+import useAppStore from "@/stores/app";
 
-export function onPluginReady(app: App) {
-  window.rubick.onPluginReady(
-    async ({
-      code,
-      type,
-      payload,
-    }: {
-      code: string;
-      type: string;
-      payload: any;
-    }) => {
-      window.rubick.showNotification("Hello, Rubick!");
-    }
-  );
-}
+// function onPluginReady() {
+//   window.rubick.onPluginReady(
+//     async ({
+//       code,
+//       type,
+//       payload,
+//     }: {
+//       code: string;
+//       type: string;
+//       payload: any;
+//     }) => {
+//       window.rubick.showNotification("Hello, Rubick!");
+//     }
+//   );
+// }
+
+const onSearchTextChange = () => {
+  window.rubick.setSubInput(({ text }: { text: string }) => {
+    const appStore = useAppStore();
+    appStore.textSearch = text;
+  }, "搜索~ 支持拼音/首字母");
+};
+
+const RUBICK_INIT = {
+  // onPluginReady: onPluginReady,
+  onSearchTextChange: onSearchTextChange,
+};
+
+export default RUBICK_INIT;
