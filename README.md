@@ -13,6 +13,7 @@
 
 ### 使用方法
 
+- 需要先安装 [Rubick](https://github.com/rubickCenter/rubick)
 - release 页面 ->下载 zip 文件
 - 选择解压到一个好地方，比如：`C:\work_sapce\rubick-jtb`
 - 进入到解压目录
