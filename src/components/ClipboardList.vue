@@ -6,7 +6,9 @@
         :key="record.hash"
         :record="record"
         :index="index + 1"
+        :selected="index === selectedIndex"
         @click="handleClickItem(record)"
+        @mouseenter="selectedIndex = index"
       />
 
       <n-empty
@@ -46,7 +48,7 @@ import useAppStore from "@/stores/app";
 import type { ClipboardRecord } from "@/types/services";
 import { AddOutline } from "@/utils/icons";
 import { NButton, NEmpty, NIcon, NScrollbar } from "naive-ui";
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import AddFavoriteModal from "./AddFavoriteModal.vue";
 import ClipboardItem from "./ClipboardItem.vue";
 
@@ -56,6 +58,56 @@ const hasRecords = computed(() => records.value.length > 0);
 const isFavoriteTab = computed(() => appStore.activeTab === "favorite");
 
 const showAddModal = ref(false);
+const selectedIndex = ref(0);
+
+// 监听记录变化，调整选中索引
+watch(records, () => {
+  if (records.value.length === 0) {
+    selectedIndex.value = 0;
+  } else if (selectedIndex.value >= records.value.length) {
+    selectedIndex.value = records.value.length - 1;
+  }
+});
+
+// 键盘事件处理
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (!hasRecords.value) return;
+
+  const key = event.key.toLowerCase();
+
+  // 上方向键 或 K 键
+  if (key === "arrowup" || key === "k") {
+    event.preventDefault();
+    if (selectedIndex.value > 0) {
+      selectedIndex.value--;
+    }
+  }
+  // 下方向键 或 J 键
+  else if (key === "arrowdown" || key === "j") {
+    event.preventDefault();
+    if (selectedIndex.value < records.value.length - 1) {
+      selectedIndex.value++;
+    }
+  }
+  // Enter 键
+  else if (key === "enter") {
+    event.preventDefault();
+    const selectedRecord = records.value[selectedIndex.value];
+    if (selectedRecord) {
+      handleClickItem(selectedRecord);
+    }
+  }
+};
+
+// 组件挂载时添加键盘监听
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyDown);
+});
+
+// 组件卸载时移除键盘监听
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyDown);
+});
 
 const handleClickItem = async (record: ClipboardRecord) => {
   if (window.rubick) {
