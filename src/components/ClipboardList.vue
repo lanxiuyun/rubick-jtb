@@ -7,8 +7,9 @@
         :record="record"
         :index="index + 1"
         :selected="index === selectedIndex"
+        :scroll-behavior="scrollBehavior"
         @click="handleClickItem(record)"
-        @mouseenter="selectedIndex = index"
+        @mouseenter="handleMouseEnter(index)"
       />
 
       <n-empty
@@ -59,6 +60,7 @@ const isFavoriteTab = computed(() => appStore.activeTab === "favorite");
 
 const showAddModal = ref(false);
 const selectedIndex = ref(0);
+const scrollBehavior = ref<"nearest" | "center">("nearest");
 
 // 监听记录变化，调整选中索引
 watch(records, () => {
@@ -69,6 +71,12 @@ watch(records, () => {
   }
 });
 
+// 鼠标移入处理
+const handleMouseEnter = (index: number) => {
+  scrollBehavior.value = "nearest";
+  selectedIndex.value = index;
+};
+
 // 键盘事件处理
 const handleKeyDown = (event: KeyboardEvent) => {
   if (!hasRecords.value) return;
@@ -78,6 +86,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   // 上方向键 或 K 键
   if (key === "arrowup" || key === "k") {
     event.preventDefault();
+    scrollBehavior.value = "center";
     if (selectedIndex.value > 0) {
       selectedIndex.value--;
     }
@@ -85,6 +94,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
   // 下方向键 或 J 键
   else if (key === "arrowdown" || key === "j") {
     event.preventDefault();
+    scrollBehavior.value = "center";
     if (selectedIndex.value < records.value.length - 1) {
       selectedIndex.value++;
     }

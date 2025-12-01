@@ -101,6 +101,7 @@ const props = defineProps<{
   record: ClipboardRecord;
   index: number;
   selected?: boolean;
+  scrollBehavior?: "nearest" | "center";
 }>();
 
 const appStore = useAppStore();
@@ -161,7 +162,7 @@ watch(
     if (isSelected && itemRef.value) {
       itemRef.value.scrollIntoView({
         behavior: "auto",
-        block: "center",
+        block: props.scrollBehavior || "nearest",
       });
     }
   }
