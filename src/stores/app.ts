@@ -1,5 +1,5 @@
 import RUBICK_DB from "@/rubick/db";
-import type { ClipboardRecord } from "@/types/services";
+import type { ClipboardEntry, ClipboardRecord } from "@/types/services";
 import { matchText } from "@/utils/pinyin";
 import { defineStore } from "pinia";
 
@@ -7,7 +7,7 @@ export type TabKey = "all" | "text" | "files" | "image" | "favorite";
 
 export const useAppStore = defineStore("app-store", {
   state: () => ({
-    records: [] as ClipboardRecord[],
+    records: [] as ClipboardEntry[],
     activeTab: "all" as TabKey,
 
     // 用户输入
@@ -15,7 +15,7 @@ export const useAppStore = defineStore("app-store", {
   }),
   getters: {
     // 根据当前 tab 筛选记录
-    filteredRecords(state): ClipboardRecord[] {
+    filteredRecords(state): ClipboardEntry[] {
       let filteredRecords = state.records;
 
       // 收藏 tab：只显示收藏的记录
@@ -60,7 +60,7 @@ export const useAppStore = defineStore("app-store", {
       this.records = await RUBICK_DB.getClipboardData();
     },
 
-    async addRecord(record: ClipboardRecord) {
+    async addRecord(record: ClipboardEntry) {
       // 去重：检查是否已存在相同 hash 的记录
       const existingIndex = this.records.findIndex(
         (r) => r.hash === record.hash
@@ -108,13 +108,15 @@ export const useAppStore = defineStore("app-store", {
       value: string | any;
     }) {
       let hash: string;
-      let recordData: ClipboardRecord;
+      let recordData: ClipboardEntry;
 
       if (data.type === "image") {
         // 如果是图片类型,需要调用主进程保存图片并获取路径
         if (window.rubick && window.services) {
           try {
-            const imagePath = await window.services.saveClipboardImage(data.value);
+            const imagePath = await window.services.saveClipboardImage(
+              data.value
+            );
             hash = `manual_image_${Date.now()}`;
             recordData = {
               type: "image",

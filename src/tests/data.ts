@@ -1,6 +1,6 @@
-import type { ClipboardRecord } from "@/types/services";
+import type { ClipboardEntry } from "@/types/services";
 
-const records: ClipboardRecord[] = [
+const records: ClipboardEntry[] = [
   // 【图片类型】
   { type: "image", size: 130771, timestamp: 1762936289285, hash: "cc7682a59441991976227413e2cc1113", value: "C:\\Users\\lxy\\AppData\\Roaming\\rubick\\clipboard-data\\1762935915639\\cc7682a59441991976227413e2cc1113" },
   { type: "image", size: 10296, timestamp: 1762935421370, hash: "aab398c1064500f1fdbb00bfc2f0670d", value: "C:\\Users\\lxy\\AppData\\Roaming\\rubick\\clipboard-data\\1762934802151\\aab398c1064500f1fdbb00bfc2f0670d" },

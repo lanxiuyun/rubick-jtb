@@ -11,6 +11,9 @@ export interface ClipboardRecord {
   size?: number;
   timestamp: number;
   hash: string;
+}
+
+export interface ClipboardEntry extends ClipboardRecord {
   favorite?: boolean; // 是否收藏
 }
 
@@ -22,8 +25,8 @@ declare global {
       removeRecords: (hashList: string[]) => Promise<void>;
       listenAppendRecord: (listener: (record: ClipboardRecord) => void) => void;
       filesExists: (paths: string[]) => boolean[];
-      executeCopy: (items: ClipboardRecord[]) => void;
-      dragToFiles: (items: ClipboardRecord[]) => void;
+      executeCopy: (items: ClipboardRecord[] | ClipboardEntry[]) => void;
+      dragToFiles: (items: ClipboardRecord[] | ClipboardEntry[]) => void;
       saveClipboardImage: (imageDataUrl: string) => Promise<string>;
     };
   }

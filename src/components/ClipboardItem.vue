@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import useAppStore from "@/stores/app";
-import type { ClipboardRecord, FileInfo } from "@/types/services";
+import type { ClipboardEntry, FileInfo } from "@/types/services";
 import { formatFileSize, truncateText } from "@/utils/clipboard";
 import {
   AppsOutline,
@@ -98,7 +98,7 @@ interface FileItemInfo extends FileInfo {
 }
 
 const props = defineProps<{
-  record: ClipboardRecord;
+  record: ClipboardEntry;
   index: number;
   selected?: boolean;
   scrollBehavior?: "nearest" | "center";
