@@ -31,20 +31,20 @@ _rev 的意义在于：
 虽然增加了一点复杂度，但换来的是数据的安全性和一致性
 */
 
-import type { ClipboardRecord } from "@/types/services";
+import type { ClipboardEntry } from "@/types/services";
 
 const lanxiuyun_clipboard_key = "lanxiuyun_clipboard";
 
-const getClipboardData = async (): Promise<ClipboardRecord[]> => {
+const getClipboardData = async (): Promise<ClipboardEntry[]> => {
   try {
     const data = await window.rubick.db.get(lanxiuyun_clipboard_key);
-    return JSON.parse(data.data) as ClipboardRecord[];
+    return JSON.parse(data.data) as ClipboardEntry[];
   } catch (error) {
     return [];
   }
 };
 
-const setClipboardData = async (data: ClipboardRecord[]): Promise<void> => {
+const setClipboardData = async (data: ClipboardEntry[]): Promise<void> => {
   try {
     // 先获取当前文档以获得 _rev
     const existingDoc = await window.rubick.db.get(lanxiuyun_clipboard_key);

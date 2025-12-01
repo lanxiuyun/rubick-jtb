@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import useAppStore from "@/stores/app";
-import type { ClipboardRecord } from "@/types/services";
+import type { ClipboardEntry } from "@/types/services";
 import { AddOutline } from "@/utils/icons";
 import { NButton, NEmpty, NIcon, NScrollbar } from "naive-ui";
 import { computed, ref } from "vue";
@@ -57,7 +57,7 @@ const isFavoriteTab = computed(() => appStore.activeTab === "favorite");
 
 const showAddModal = ref(false);
 
-const handleClickItem = async (record: ClipboardRecord) => {
+const handleClickItem = async (record: ClipboardEntry) => {
   if (window.rubick) {
     window.services.executeCopy([record]);
     return;
