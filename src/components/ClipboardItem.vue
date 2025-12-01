@@ -1,5 +1,5 @@
 <template>
-  <div class="list-item">
+  <div class="list-item" :class="{ selected: selected }" ref="itemRef">
     <div class="item-time">{{ timeLabel }}</div>
 
     <div class="item-content">
@@ -100,9 +100,12 @@ interface FileItemInfo extends FileInfo {
 const props = defineProps<{
   record: ClipboardRecord;
   index: number;
+  selected?: boolean;
+  scrollBehavior?: "nearest" | "center";
 }>();
 
 const appStore = useAppStore();
+const itemRef = ref<HTMLElement | null>(null);
 
 const timeLabel = computed(() => getRelativeTime(props.record.timestamp));
 
@@ -151,6 +154,19 @@ const loadImageDimensions = () => {
 };
 
 watch(() => props.record, loadImageDimensions, { immediate: true, deep: true });
+
+// ===== 选中状态自动滚动 =====
+watch(
+  () => props.selected,
+  (isSelected) => {
+    if (isSelected && itemRef.value) {
+      itemRef.value.scrollIntoView({
+        behavior: "auto",
+        block: props.scrollBehavior || "nearest",
+      });
+    }
+  }
+);
 
 // ===== 文件类型相关 =====
 const IMAGE_EXTENSIONS = new Set([
@@ -236,7 +252,8 @@ const singleImageUrl = computed(() => {
   border-radius: 4px;
   position: relative;
 
-  &:hover {
+  &:hover,
+  &.selected {
     background-color: #f5f5f5;
     transform: translateX(4px);
     box-shadow: -4px 0 0 0 var(--n-color, #18a058),

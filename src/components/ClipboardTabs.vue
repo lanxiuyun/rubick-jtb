@@ -31,7 +31,7 @@ import {
   TextOutline,
 } from "@/utils/icons";
 import { NButton, NIcon, NSpace } from "naive-ui";
-import type { Component } from "vue";
+import { onMounted, onUnmounted, type Component } from "vue";
 
 const tabs: { key: TabKey; label: string; icon: Component }[] = [
   { key: "all", label: "全部", icon: AppsOutline },
@@ -48,6 +48,39 @@ const isActive = (key: TabKey) => appStore.activeTab === key;
 const handleTabClick = (key: TabKey) => {
   appStore.activeTab = key;
 };
+
+// 键盘事件处理
+const handleKeyDown = (event: KeyboardEvent) => {
+  const key = event.key.toLowerCase();
+  
+  // 获取当前 tab 的索引
+  const currentIndex = tabs.findIndex((tab) => tab.key === appStore.activeTab);
+  
+  // 左方向键
+  if (key === "arrowleft") {
+    event.preventDefault();
+    if (currentIndex > 0) {
+      appStore.activeTab = tabs[currentIndex - 1].key;
+    }
+  }
+  // 右方向键
+  else if (key === "arrowright") {
+    event.preventDefault();
+    if (currentIndex < tabs.length - 1) {
+      appStore.activeTab = tabs[currentIndex + 1].key;
+    }
+  }
+};
+
+// 组件挂载时添加键盘监听
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyDown);
+});
+
+// 组件卸载时移除键盘监听
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyDown);
+});
 </script>
 
 <style scoped lang="scss">
