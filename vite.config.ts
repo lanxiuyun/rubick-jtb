@@ -14,10 +14,10 @@ export default defineConfig({
     },
   },
   // 生产环境开启 sourcemap
-  // build: {
-  //   minify: false,
-  //   sourcemap: true,
-  // },
+  build: {
+    minify: false,
+    sourcemap: true,
+  },
   server: {
     port: 4001,
   },
