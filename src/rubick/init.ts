@@ -16,6 +16,14 @@ import useAppStore from "@/stores/app";
 //   );
 // }
 
+function onShow() {
+  window.rubick.hooks.onShow = () => {
+    const appStore = useAppStore();
+    appStore.textSearch = "";
+    window.rubick.showNotification("Hello, Rubick!");
+  };
+}
+
 const onSearchTextChange = () => {
   window.rubick.setSubInput(({ text }: { text: string }) => {
     const appStore = useAppStore();
@@ -26,6 +34,7 @@ const onSearchTextChange = () => {
 const RUBICK_INIT = {
   // onPluginReady: onPluginReady,
   onSearchTextChange: onSearchTextChange,
+  onShow: onShow,
 };
 
 export default RUBICK_INIT;
