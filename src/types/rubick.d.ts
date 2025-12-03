@@ -1,3 +1,13 @@
+/** 插件进入时的回调参数 */
+interface PluginEnterParams {
+  /** 插件入口的 code */
+  code: string;
+  /** 插件入口的类型 */
+  type: string;
+  /** 用户输入的内容/图片*/
+  payload: string | Record<string, any>;
+}
+
 interface RubickHooks {
   onPluginEnter?: (cb: Function) => void;
   onPluginReady?: (cb: Function) => void;
@@ -28,10 +38,12 @@ interface Rubick {
   __event__: Record<string, any>;
 
   // 事件相关
-  onPluginEnter: (cb: Function) => void;
-  onPluginReady: (cb: Function) => void;
+  onPluginEnter: (cb: (params: PluginEnterParams) => void) => void;
+  onPluginReady: (cb: (params: PluginEnterParams) => void) => void;
   onPluginOut: (cb: Function) => void;
   openPlugin: (plugin: any) => void;
+  onShow: () => void;
+  onHide: () => void;
 
   // 窗口交互
   hideMainWindow: () => void;
