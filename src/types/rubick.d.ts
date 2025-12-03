@@ -14,6 +14,8 @@ interface RubickHooks {
   onPluginOut?: (cb: Function) => void;
   onSubInputChange?: (text: string) => void;
   onScreenCapture?: (data: { data: any }) => void;
+  onShow?: () => void;
+  onHide?: () => void;
 }
 
 interface RubickDB {
@@ -42,8 +44,6 @@ interface Rubick {
   onPluginReady: (cb: (params: PluginEnterParams) => void) => void;
   onPluginOut: (cb: Function) => void;
   openPlugin: (plugin: any) => void;
-  onShow: () => void;
-  onHide: () => void;
 
   // 窗口交互
   hideMainWindow: () => void;
