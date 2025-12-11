@@ -48,7 +48,7 @@ module.exports = () => {
       class ClipboardWatcher {
         currentRecordFileStat = null;
         clipboardData = path.join(app.getPath('userData'), 'clipboard-data');
-        maxGroupRecordNum = 6;
+        maxGroupRecordNum = 500; // 每个文件夹最多保存500条记录
     
         constructor() {
       
@@ -104,7 +104,7 @@ module.exports = () => {
             .filter((e) => /^\d{13}$/.test(e))
             .sort()
             .reverse()
-            .slice(0, 6);
+            .slice(0, 4);
           if (clipboardDirs.length > target.length) {
             clipboardDirs
               .filter((e) => !target.includes(e))
