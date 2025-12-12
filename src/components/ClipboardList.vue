@@ -1,6 +1,7 @@
 <template>
   <div v-if="hasRecords" class="list-wrapper">
     <n-virtual-list
+      ref="virtualListRef"
       :items="records"
       :item-size="24"
       :item-resizable="true"
@@ -56,6 +57,7 @@ import AddFavoriteModal from "./AddFavoriteModal.vue";
 import ClipboardItem from "./ClipboardItem.vue";
 
 const appStore = useAppStore();
+const virtualListRef = ref<InstanceType<typeof NVirtualList> | null>(null);
 
 // 虚拟列表数据需要 key 属性，key 属性是虚拟列表的唯一标识
 const records = computed(() =>
@@ -71,6 +73,14 @@ const isFavoriteTab = computed(() => appStore.activeTab === "favorite");
 const showAddModal = ref(false);
 const selectedIndex = ref(0);
 const scrollBehavior = ref<"nearest" | "center">("nearest");
+
+// 监听搜索词变化，滚动到顶部
+watch(
+  () => appStore.textSearch,
+  () => {
+    virtualListRef.value?.scrollTo({ top: 0 });
+  }
+);
 
 // 监听记录变化，调整选中索引
 watch(records, () => {
