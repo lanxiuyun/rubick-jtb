@@ -1,25 +1,30 @@
 <template>
-  <n-scrollbar class="list-scroll">
-    <div class="list-container">
-      <ClipboardItem
-        v-for="(record, index) in records"
-        :key="record.hash"
-        :record="record"
-        :index="index + 1"
-        :selected="index === selectedIndex"
-        :scroll-behavior="scrollBehavior"
-        @click="handleClickItem(record)"
-        @mouseenter="handleMouseEnter(index)"
-      />
+  <div v-if="hasRecords" class="list-wrapper">
+    <n-virtual-list
+      :items="records"
+      :item-size="24"
+      :item-resizable="true"
+      class="virtual-list"
+    >
+      <template #default="{ item: record, index }">
+        <ClipboardItem
+          :record="record"
+          :index="index + 1"
+          :selected="index === selectedIndex"
+          :scroll-behavior="scrollBehavior"
+          @click="handleClickItem(record)"
+          @mouseenter="handleMouseEnter(index)"
+        />
+      </template>
+    </n-virtual-list>
+  </div>
 
-      <n-empty
-        v-if="!hasRecords"
-        description="暂无剪贴板记录"
-        size="small"
-        class="empty-state"
-      />
-    </div>
-  </n-scrollbar>
+  <n-empty
+    v-else
+    description="暂无剪贴板记录"
+    size="small"
+    class="empty-state"
+  />
 
   <!-- 添加常用数据按钮（仅在收藏标签页显示） -->
   <n-button
@@ -38,23 +43,28 @@
   </n-button>
 
   <!-- 添加常用数据弹窗 -->
-  <AddFavoriteModal
-    v-model:show="showAddModal"
-    @submit="handleAddFavorite"
-  />
+  <AddFavoriteModal v-model:show="showAddModal" @submit="handleAddFavorite" />
 </template>
 
 <script setup lang="ts">
 import useAppStore from "@/stores/app";
 import type { ClipboardEntry } from "@/types/services";
 import { AddOutline } from "@/utils/icons";
-import { NButton, NEmpty, NIcon, NScrollbar } from "naive-ui";
+import { NButton, NEmpty, NIcon, NVirtualList } from "naive-ui";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import AddFavoriteModal from "./AddFavoriteModal.vue";
 import ClipboardItem from "./ClipboardItem.vue";
 
 const appStore = useAppStore();
-const records = computed(() => appStore.filteredRecords);
+
+// 虚拟列表数据需要 key 属性，key 属性是虚拟列表的唯一标识
+const records = computed(() =>
+  appStore.filteredRecords.map((record, index) => ({
+    ...record,
+    key: record.hash || `record-${index}`,
+  }))
+);
+
 const hasRecords = computed(() => records.value.length > 0);
 const isFavoriteTab = computed(() => appStore.activeTab === "favorite");
 
@@ -157,28 +167,16 @@ const handleAddFavorite = async (data: {
   font-family: v-sans, system-ui, -apple-system, sans-serif;
 }
 
-.header {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fafafa;
-}
-
-.header-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-
-.list-scroll {
+.list-wrapper {
   flex: 1;
-  background-color: #fff;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
-.list-container {
-  padding: 8px;
+.virtual-list {
+  height: 100%;
 }
 
 .float-btn {
