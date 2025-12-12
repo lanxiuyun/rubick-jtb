@@ -153,30 +153,20 @@ const handleAddFavorite = async (data: {
 </script>
 
 <style scoped lang="scss">
-.clipboard-box {
-  width: 100%;
-  max-width: 800px;
-  height: calc(100vh - 60px);
-  margin: 0 auto;
-  background-color: #fff;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  font-family: v-sans, system-ui, -apple-system, sans-serif;
-}
-
 .list-wrapper {
   flex: 1;
-  height: calc(100vh - 60px);
+  /* 移除固定高度计算，使用 flex 自适应 */
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  padding: 8px;
   box-sizing: border-box;
 }
 
 .virtual-list {
-  height: 100%;
+  flex: 1;
+  height: 100% !important;
 }
 
 .float-btn {
