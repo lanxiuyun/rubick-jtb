@@ -13,6 +13,7 @@ const app = createApp(App);
 // 添加 if 可以兼容浏览器环境
 // 如果当前环境是 Rubick，则初始化 Rubick 相关功能
 if (window?.rubick) {
+  RUBICK_INIT.onShow();
   RUBICK_INIT.onSearchTextChange();
 }
 
