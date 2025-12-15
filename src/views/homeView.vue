@@ -24,7 +24,7 @@ if (window.rubick) {
     });
   });
 } else {
-  appStore.records = TEST_DATA.records;
+  appStore.serviceRecords = TEST_DATA.records;
 }
 </script>
 
