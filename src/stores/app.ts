@@ -61,19 +61,6 @@ export const useAppStore = defineStore("app-store", {
       if (this.serviceRecords.length > 2000) {
         this.serviceRecords = this.serviceRecords.slice(0, 2000);
       }
-
-      // 2. 如果是已收藏项，更新时间戳并置顶
-      const favIdx = this.favoritesRecords.findIndex(
-        (r) => r.hash === record.hash
-      );
-      if (favIdx !== -1) {
-        const favRecord = this.favoritesRecords[favIdx];
-        favRecord.timestamp = record.timestamp;
-
-        this.favoritesRecords.splice(favIdx, 1);
-        this.favoritesRecords.unshift(favRecord);
-        await this.saveFavorites();
-      }
     },
 
     // 切换收藏状态
