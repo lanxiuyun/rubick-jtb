@@ -1,163 +1,123 @@
 import RUBICK_DB from "@/rubick/db";
 import type { ClipboardEntry, ClipboardRecord } from "@/types/services";
-import { matchText } from "@/utils/pinyin";
+import {
+  filterRecords,
+  mergeRecords,
+  saveImageIfNeeded,
+} from "@/utils/clipboard";
 import { defineStore } from "pinia";
 
 export type TabKey = "all" | "text" | "files" | "image" | "favorite";
 
 export const useAppStore = defineStore("app-store", {
   state: () => ({
-    records: [] as ClipboardEntry[],
+    serviceRecords: [] as ClipboardRecord[], // 历史记录 (Service)
+    favoritesRecords: [] as ClipboardEntry[], // 收藏记录 (DB)
     activeTab: "all" as TabKey,
-
-    // 用户输入
     textSearch: "" as string,
   }),
+
   getters: {
-    // 根据当前 tab 筛选记录
-    filteredRecords(state): ClipboardEntry[] {
-      let filteredRecords = state.records;
+    // 合并 Service 记录和收藏记录
+    records(state): ClipboardEntry[] {
+      return mergeRecords(state.serviceRecords, state.favoritesRecords);
+    },
 
-      // 收藏 tab：只显示收藏的记录
-      if (state.activeTab === "favorite") {
-        filteredRecords = filteredRecords.filter((record) => record.favorite);
-      }
-      // 根据 tab 筛选
-      else if (state.activeTab !== "all") {
-        filteredRecords = filteredRecords.filter(
-          (record) => record.type === state.activeTab
-        );
-      }
-
-      // 根据搜索文本筛选（支持中文拼音和首字母匹配）
-      if (state.textSearch) {
-        const keyword = state.textSearch;
-        filteredRecords = filteredRecords.filter((record) => {
-          // 文本类型：搜索 value（支持拼音）
-          if (record.type === "text" && typeof record.value === "string") {
-            return matchText(record.value, keyword);
-          }
-          // 文件类型：搜索文件名和路径（支持拼音）
-          if (record.type === "files" && Array.isArray(record.value)) {
-            return record.value.some(
-              (file) =>
-                matchText(file.name, keyword) || matchText(file.path, keyword)
-            );
-          }
-          // 图片类型：搜索路径（支持拼音）
-          if (record.type === "image" && typeof record.value === "string") {
-            return matchText(record.value, keyword);
-          }
-          return false;
-        });
-      }
-
-      return filteredRecords;
+    // UI 使用的最终列表 (带筛选)
+    filteredRecords(): ClipboardEntry[] {
+      return filterRecords(this.records, this.activeTab, this.textSearch);
     },
   },
+
   actions: {
     async fetchRecords() {
-      this.records = await RUBICK_DB.getClipboardData();
+      // 并行获取两个列表
+      const [dbFavorites, serviceRecords] = await Promise.all([
+        RUBICK_DB.getFavorites(),
+        window.services?.readAllRecords().catch(() => []) || [],
+      ]);
+
+      this.favoritesRecords = dbFavorites;
+      this.serviceRecords = serviceRecords;
     },
 
-    async addRecord(record: ClipboardEntry) {
-      // 去重：检查是否已存在相同 hash 的记录
-      const existingIndex = this.records.findIndex(
+    // 保存收藏到 DB
+    async saveFavorites() {
+      await RUBICK_DB.saveFavorites(this.favoritesRecords);
+    },
+
+    // 接收新剪贴板事件
+    async addRecord(record: ClipboardRecord) {
+      // 1. Service Records 去重并添加到头部
+      const existingIdx = this.serviceRecords.findIndex(
         (r) => r.hash === record.hash
       );
-      if (existingIndex !== -1) {
-        // 如果已存在，保留收藏状态并移除旧的记录
-        record.favorite = this.records[existingIndex].favorite;
-        this.records.splice(existingIndex, 1);
+      if (existingIdx !== -1) {
+        this.serviceRecords.splice(existingIdx, 1);
       }
+      this.serviceRecords.unshift(record);
 
-      this.records = [record, ...this.records];
-
-      // 限制记录数量，但保留所有收藏的记录
-      if (this.records.length > 2000) {
-        // 将记录分为收藏和非收藏两部分
-        const favoriteRecords = this.records.filter((r) => r.favorite);
-        const nonFavoriteRecords = this.records.filter((r) => !r.favorite);
-        
-        // 非收藏记录只保留最新的2000条
-        const trimmedNonFavorites = nonFavoriteRecords.slice(0, 2000);
-        
-        // 合并：保持原有时间顺序
-        this.records = [...favoriteRecords, ...trimmedNonFavorites].sort(
-          (a, b) => b.timestamp - a.timestamp
-        );
+      // 限制大小
+      if (this.serviceRecords.length > 2000) {
+        this.serviceRecords = this.serviceRecords.slice(0, 2000);
       }
-
-      // 更新数据库（添加 await 确保数据同步完成）
-      await RUBICK_DB.setClipboardData(this.records);
     },
 
     // 切换收藏状态
     async toggleFavorite(hash: string) {
-      const record = this.records.find((r) => r.hash === hash);
-      if (record) {
-        record.favorite = !record.favorite;
-        // 持久化到数据库
-        await RUBICK_DB.setClipboardData(this.records);
+      const favIndex = this.favoritesRecords.findIndex((r) => r.hash === hash);
+
+      if (favIndex !== -1) {
+        // 取消收藏
+        this.favoritesRecords.splice(favIndex, 1);
+      } else {
+        // 添加收藏 (从合并列表中查找完整数据)
+        const record = this.records.find((r) => r.hash === hash);
+        if (record) {
+          this.favoritesRecords.unshift({ ...record, favorite: true });
+        }
       }
+      await this.saveFavorites();
     },
 
-    // 手动创建并收藏记录
+    // 手动创建并收藏
     async createFavoriteRecord(data: {
       type: "text" | "image" | "files";
-      value: string | any;
+      value: any;
     }) {
-      let hash: string;
-      let recordData: ClipboardEntry;
+      try {
+        const timestamp = Date.now();
+        let value = data.value;
+        let hash: string;
 
-      if (data.type === "image") {
-        // 如果是图片类型,需要调用主进程保存图片并获取路径
-        if (window.rubick && window.services) {
-          try {
-            const imagePath = await window.services.saveClipboardImage(
-              data.value
-            );
-            hash = `manual_image_${Date.now()}`;
-            recordData = {
-              type: "image",
-              value: imagePath,
-              timestamp: Date.now(),
-              hash,
-              favorite: true,
-            };
-          } catch (error) {
-            console.error("保存图片失败", error);
-            throw error;
-          }
+        // 特殊处理图片
+        if (data.type === "image") {
+          value = await saveImageIfNeeded(value);
+          hash = `manual_image_${timestamp}`;
         } else {
-          // 浏览器环境，直接使用 data URL
-          hash = `manual_image_${Date.now()}`;
-          recordData = {
-            type: "image",
-            value: data.value,
-            timestamp: Date.now(),
-            hash,
-            favorite: true,
-          };
+          const content = JSON.stringify(value);
+          hash = `manual_${timestamp}_${content.substring(0, 20)}`;
         }
-      } else {
-        // 文本或文件类型
-        const content = JSON.stringify(data.value);
-        hash = `manual_${Date.now()}_${content.substring(0, 20)}`;
-        recordData = {
-          type: data.type as "text" | "files",
-          value: data.value,
-          timestamp: Date.now(),
+
+        const newRecord: ClipboardEntry = {
+          type: data.type as any,
+          value,
+          timestamp,
           hash,
           favorite: true,
         };
+
+        // 1. 添加到收藏
+        this.favoritesRecords.unshift(newRecord);
+        await this.saveFavorites();
+
+        // 2. 添加到 Service 历史
+        const { favorite, ...serviceItem } = newRecord;
+        this.serviceRecords.unshift(serviceItem);
+      } catch (error) {
+        console.error("创建记录失败", error);
+        throw error;
       }
-
-      // 添加到记录列表头部
-      this.records = [recordData, ...this.records];
-
-      // 持久化到数据库
-      await RUBICK_DB.setClipboardData(this.records);
     },
   },
 });

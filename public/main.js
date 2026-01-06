@@ -48,7 +48,7 @@ module.exports = () => {
       class ClipboardWatcher {
         currentRecordFileStat = null;
         clipboardData = path.join(app.getPath('userData'), 'clipboard-data');
-        maxGroupRecordNum = 500; // 每个文件夹最多保存500条记录
+        maxGroupRecordNum = 1000; // 每个文件夹最多保存1000条记录
     
         constructor() {
       
@@ -104,7 +104,7 @@ module.exports = () => {
             .filter((e) => /^\d{13}$/.test(e))
             .sort()
             .reverse()
-            .slice(0, 4);
+            .slice(0, 50);
           if (clipboardDirs.length > target.length) {
             clipboardDirs
               .filter((e) => !target.includes(e))
@@ -136,34 +136,66 @@ module.exports = () => {
         }
         
         readAllRecords() {
-          const i = clipboardWatch.getRecordFolderNames();
-          if (!i) return;
-          if (0 === i.length) return [];
-          const n = {};
-          let o = 0;
-          for (const t of i) {
-            const i = path.join(clipboardWatch.clipboardData, t, "data");
-            if (!fs.existsSync(i)) {
-              rimraf(path.join(clipboardWatch.clipboardData, t), (() => {
-              }));
-              continue
+          const folderNames = this.getRecordFolderNames();
+          if (!folderNames || folderNames.length === 0) return [];
+
+          const recordsMap = {};
+          let recordCount = 0;
+          const MAX_RECORDS = 50000; // 最多读取 50000 条记录
+
+          for (const folderName of folderNames) {
+            const folderPath = path.join(this.clipboardData, folderName);
+            const dataPath = path.join(folderPath, "data");
+
+            // 如果数据文件不存在，清理文件夹并跳过
+            if (!fs.existsSync(dataPath)) {
+              rimraf(folderPath, () => {});
+              continue;
             }
-            let s;
+
+            let fileContent;
             try {
-              s = fs.readFileSync(i, "utf-8")
-            } catch (e) {
-              continue
+              fileContent = fs.readFileSync(dataPath, "utf-8");
+            } catch (error) {
+              continue;
             }
-            const r = s.split("\n").reverse();
-            for (const i of r) {
-              if (!i) continue;
-              const s = L(i);
-              if (!s || !s.startsWith("{")) continue;
-              const r = JSON.parse(s);
-              if (!(r.hash in n) && ("image" === r.type && (r.value = path.join(clipboardWatch.clipboardData, t, r.hash)), n[r.hash] = r, ++o >= 500)) return e(Object.values(n))
+
+            // 倒序读取，最新的在后面
+            const lines = fileContent.split("\n").reverse();
+
+            for (const line of lines) {
+              if (!line) continue;
+
+              const decryptedContent = L(line);
+              // 简单校验解密内容是否为 JSON 对象
+              if (!decryptedContent || !decryptedContent.startsWith("{")) continue;
+
+              try {
+                const record = JSON.parse(decryptedContent);
+
+                // 如果记录已存在，跳过（去重）
+                if (record.hash in recordsMap) continue;
+
+                // 如果是图片，构造完整的图片路径
+                if (record.type === "image") {
+                  record.value = path.join(folderPath, record.hash);
+                }
+
+                recordsMap[record.hash] = record;
+                recordCount++;
+
+                // 达到最大记录数，提前返回
+                if (recordCount >= MAX_RECORDS) {
+                  return Object.values(recordsMap);
+                }
+              } catch (e) {
+                // 解析失败忽略
+                continue;
+              }
             }
           }
-          return Object.values(n)
+
+          return Object.values(recordsMap);
         }
         
         startDrag (e, i) {
