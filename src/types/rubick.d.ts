@@ -148,6 +148,12 @@ export {};
 //   openPlugin(plugin) {
 //     ipcSendSync('loadPlugin', plugin);
 //   },
+//   onShow(cb) {
+//     typeof cb === 'function' && (window.rubick.hooks.onShow = cb);
+//   },
+//   onHide(cb) {
+//     typeof cb === 'function' && (window.rubick.hooks.onHide = cb);
+//   },
 //   // 窗口交互
 //   hideMainWindow() {
 //     ipcSendSync('hideMainWindow');
@@ -166,6 +172,12 @@ export {};
 //     ipcSendSync('setExpendHeight', height);
 //   },
 //   setSubInput(onChange, placeholder = '', isFocus) {
+//     typeof onChange === 'function' &&
+//       (window.rubick.hooks.onSubInputChange = onChange);
+//     ipcSendSync('setSubInput', {
+//       placeholder,
+//       isFocus,
+//     });
 //   },
 //   removeSubInput() {
 //     delete window.rubick.hooks.onSubInputChange;
