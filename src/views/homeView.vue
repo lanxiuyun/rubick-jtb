@@ -24,7 +24,12 @@ if (window.rubick) {
     });
   });
 } else {
-  appStore.serviceRecords = TEST_DATA.records;
+  // 本地调试数据：补齐虚拟列表需要的 key/favorite
+  appStore.serviceRecords = TEST_DATA.records.map((r) => ({
+    ...r,
+    favorite: !!r.favorite,
+    key: (r as any).key ?? r.hash,
+  })) as any;
 }
 </script>
 
