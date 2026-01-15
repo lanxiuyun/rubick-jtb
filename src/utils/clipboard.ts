@@ -1,4 +1,4 @@
-import type { ClipboardEntry, ClipboardRecord } from "@/types/services";
+import type { ClipboardEntry } from "@/types/services";
 import { matchText } from "./pinyin";
 
 const FILES_SEARCH_CACHE_MAX = 60000;
@@ -59,47 +59,6 @@ export function getImageDimensions(
     };
     img.src = imagePath;
   });
-}
-
-/**
- * 合并历史记录和收藏记录
- * @param serviceRecords 来自服务的历史记录
- * @param favoritesRecords 来自DB的收藏记录
- */
-export function mergeRecords(
-  serviceRecords: ClipboardRecord[],
-  favoritesRecords: ClipboardEntry[]
-): ClipboardEntry[] {
-  // 大数据量时避免 Map + sort + 大量对象拷贝
-  // 假设 serviceRecords 已经按 timestamp 倒序（fetchRecords/addRecord 会保证）
-  const favoriteSet = new Set<string>();
-  for (const fav of favoritesRecords) {
-    favoriteSet.add(fav.hash);
-    // 虚拟列表用：尽量只设置一次 key，避免 UI 层每次 map spread 产生大量新对象
-    (fav as any).key ??= fav.hash;
-    fav.favorite = true;
-  }
-
-  const merged: ClipboardEntry[] = [];
-  const serviceHashSet = new Set<string>();
-
-  for (const r of serviceRecords) {
-    const entry = r as ClipboardEntry;
-    entry.favorite = favoriteSet.has(r.hash);
-    (entry as any).key ??= r.hash;
-    merged.push(entry);
-    serviceHashSet.add(r.hash);
-  }
-
-  // 补全已过期的收藏（不在 serviceRecords 中）
-  // 通常数量不大；这里不做全量 sort，直接追加即可（一般也更符合“历史在前，过期收藏在后”）
-  for (const fav of favoritesRecords) {
-    if (!serviceHashSet.has(fav.hash)) {
-      merged.push(fav);
-    }
-  }
-
-  return merged;
 }
 
 /**

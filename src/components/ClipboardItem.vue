@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import useAppStore from "@/stores/app";
 import type { ClipboardEntry, FileInfo } from "@/types/services";
-import { formatFileSize, truncateText } from "@/utils/clipboard";
+import { formatFileSize, getImageDimensions, truncateText } from "@/utils/clipboard";
 import {
   AppsOutline,
   DocumentAttachOutline,
@@ -131,29 +131,35 @@ const imageUrl = computed(() =>
 );
 
 const fileSize = computed(() => {
-  if (props.record.type === "image" && "size" in props.record) {
-    return formatFileSize((props.record as { size: number }).size);
+  if (props.record.type === "image" && typeof props.record.size === "number") {
+    return formatFileSize(props.record.size);
   }
   return "";
 });
 
-const loadImageDimensions = () => {
-  if (props.record.type !== "image") {
-    imageDimensions.value = "";
-    return;
-  }
+watch(
+  imageUrl,
+  async (url) => {
+    if (!url) {
+      imageDimensions.value = "";
+      return;
+    }
 
-  const img = new Image();
-  img.onload = () => {
-    imageDimensions.value = `${img.width} x ${img.height}`;
-  };
-  img.onerror = (error) => {
-    console.error("图片尺寸获取失败", error);
-  };
-  img.src = imageUrl.value;
-};
-
-watch(() => props.record, loadImageDimensions, { immediate: true, deep: true });
+    const currentUrl = url;
+    try {
+      const { width, height } = await getImageDimensions(url);
+      if (imageUrl.value !== currentUrl) return;
+      imageDimensions.value = `${width} x ${height}`;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("图片尺寸获取失败", error);
+      if (imageUrl.value === currentUrl) {
+        imageDimensions.value = "";
+      }
+    }
+  },
+  { immediate: true }
+);
 
 // ===== 选中状态自动滚动 =====
 watch(

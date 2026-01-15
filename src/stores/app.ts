@@ -34,13 +34,12 @@ export const useAppStore = defineStore("app-store", {
       this.favoritesRecords = dbFavorites;
       const favoriteSet = new Set<string>(dbFavorites.map((r) => r.hash));
 
-      // 2) Service 列表：保证倒序，且直接补齐 favorite/key（避免后续 getter 每次全量 merge）
+      // 2) Service 列表：保证倒序
       serviceRecords.sort((a, b) => b.timestamp - a.timestamp);
       const serviceList = serviceRecords as ClipboardEntry[];
       const serviceHashSet = new Set<string>();
       for (const r of serviceList) {
         r.favorite = favoriteSet.has(r.hash);
-        (r as any).key ??= r.hash;
         serviceHashSet.add(r.hash);
       }
 
@@ -49,7 +48,6 @@ export const useAppStore = defineStore("app-store", {
       for (const fav of dbFavorites) {
         if (!serviceHashSet.has(fav.hash)) {
           fav.favorite = true;
-          (fav as any).key ??= fav.hash;
           expiredFavorites.push(fav);
         }
       }
@@ -71,10 +69,9 @@ export const useAppStore = defineStore("app-store", {
 
     // 接收新剪贴板事件
     async addRecord(record: ClipboardRecord) {
-      // 1) 转成 UI 用的 Entry（补齐 favorite/key）
+      // 1) 转成 UI 用的 Entry（补齐 favorite）
       const entry = record as ClipboardEntry;
       entry.favorite = this.favoritesRecords.some((r) => r.hash === record.hash);
-      (entry as any).key ??= entry.hash;
 
       // 2) 去重并添加到头部
       const existingIdx = this.serviceRecords.findIndex(
@@ -141,7 +138,6 @@ export const useAppStore = defineStore("app-store", {
           hash,
           favorite: true,
         };
-        (newRecord as any).key ??= newRecord.hash;
 
         // 1. 添加到收藏
         this.favoritesRecords.unshift(newRecord);

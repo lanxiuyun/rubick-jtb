@@ -5,6 +5,7 @@
       :items="records"
       :item-size="24"
       :item-resizable="true"
+      key-field="hash"
       class="virtual-list"
     >
       <template #default="{ item: record, index }">
