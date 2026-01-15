@@ -44,6 +44,8 @@ interface Rubick {
   onPluginReady: (cb: (params: PluginEnterParams) => void) => void;
   onPluginOut: (cb: Function) => void;
   openPlugin: (plugin: any) => void;
+  onShow: (cb: Function) => void;
+  onHide: (cb: Function) => void;
 
   // 窗口交互
   hideMainWindow: () => void;
@@ -203,6 +205,12 @@ export {};
 //   },
 //   dbStorage: {
 //     setItem: (key, value) => {
+//       const target = { _id: String(key) };
+//       const result = ipcSendSync('dbGet', { id: target._id });
+//       result && (target._rev = result._rev);
+//       target.value = value;
+//       const res = ipcSendSync('dbPut', { data: target });
+//       if (res.error) throw new Error(res.message);
 //     },
 //     getItem: (key) => {
 //       const res = ipcSendSync('dbGet', { id: key });
