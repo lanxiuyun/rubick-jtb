@@ -254,16 +254,15 @@ const singleImageUrl = computed(() => {
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   border-radius: 4px;
   position: relative;
+  border-left: 3px solid transparent;
 
   &:hover,
   &.selected {
     background-color: #f5f5f5;
-    transform: translateX(4px);
-    box-shadow: -4px 0 0 0 var(--n-color, #18a058),
-      0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left-color: var(--n-color, #18a058);
 
     .item-time {
       color: var(--n-color, #18a058);
@@ -273,7 +272,6 @@ const singleImageUrl = computed(() => {
     .item-index {
       color: var(--n-color, #18a058);
       font-weight: 600;
-      transform: scale(1.1);
     }
 
     .item-actions {
