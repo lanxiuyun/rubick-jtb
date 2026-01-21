@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --port 4001",
     "build": "vite build",
-    "build:zip": "vite build && tar -a -c -f dist.zip dist",
+    "build:zip": "vite build && node scripts/build-zip.mjs",
     "preview": "vite preview",
     "type-check": "vue-tsc --build"
   },
