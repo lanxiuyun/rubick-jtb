@@ -10,7 +10,7 @@
             :src="imageUrl"
             height="120"
             width="120"
-            object-fit="cover"
+            object-fit="contain"
           />
         </div>
         <div v-if="fileSize || imageDimensions" class="meta-info">
@@ -33,7 +33,7 @@
               :src="singleImageUrl"
               height="120"
               width="120"
-              object-fit="cover"
+              object-fit="contain"
             />
           </div>
         </div>
