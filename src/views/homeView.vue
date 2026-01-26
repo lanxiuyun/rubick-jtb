@@ -24,7 +24,11 @@ if (window.rubick) {
     });
   });
 } else {
-  appStore.serviceRecords = TEST_DATA.records;
+  // 本地调试数据：补齐 favorite
+  appStore.serviceRecords = TEST_DATA.records.map((r) => ({
+    ...r,
+    favorite: !!r.favorite,
+  }));
 }
 </script>
 

@@ -19,8 +19,7 @@ import useAppStore from "@/stores/app";
 function onShow() {
   window.rubick.hooks.onShow = () => {
     const appStore = useAppStore();
-    appStore.textSearch = "";
-    window.rubick.showNotification("Hello, Rubick!");
+    window.rubick.setSubInputValue(appStore.textSearch);
   };
 }
 

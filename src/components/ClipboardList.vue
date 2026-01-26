@@ -5,6 +5,7 @@
       :items="records"
       :item-size="24"
       :item-resizable="true"
+      key-field="hash"
       class="virtual-list"
     >
       <template #default="{ item: record, index }">
@@ -59,13 +60,7 @@ import ClipboardItem from "./ClipboardItem.vue";
 const appStore = useAppStore();
 const virtualListRef = ref<InstanceType<typeof NVirtualList> | null>(null);
 
-// 虚拟列表数据需要 key 属性，key 属性是虚拟列表的唯一标识
-const records = computed(() =>
-  appStore.filteredRecords.map((record, index) => ({
-    ...record,
-    key: record.hash || `record-${index}`,
-  }))
-);
+const records = computed(() => appStore.filteredRecords);
 
 const hasRecords = computed(() => records.value.length > 0);
 const isFavoriteTab = computed(() => appStore.activeTab === "favorite");

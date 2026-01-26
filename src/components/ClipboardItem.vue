@@ -10,7 +10,7 @@
             :src="imageUrl"
             height="120"
             width="120"
-            object-fit="cover"
+            object-fit="contain"
           />
         </div>
         <div v-if="fileSize || imageDimensions" class="meta-info">
@@ -33,7 +33,7 @@
               :src="singleImageUrl"
               height="120"
               width="120"
-              object-fit="cover"
+              object-fit="contain"
             />
           </div>
         </div>
@@ -80,7 +80,7 @@
 <script setup lang="ts">
 import useAppStore from "@/stores/app";
 import type { ClipboardEntry, FileInfo } from "@/types/services";
-import { formatFileSize, truncateText } from "@/utils/clipboard";
+import { formatFileSize, getImageDimensions, truncateText } from "@/utils/clipboard";
 import {
   AppsOutline,
   DocumentAttachOutline,
@@ -131,29 +131,35 @@ const imageUrl = computed(() =>
 );
 
 const fileSize = computed(() => {
-  if (props.record.type === "image" && "size" in props.record) {
-    return formatFileSize((props.record as { size: number }).size);
+  if (props.record.type === "image" && typeof props.record.size === "number") {
+    return formatFileSize(props.record.size);
   }
   return "";
 });
 
-const loadImageDimensions = () => {
-  if (props.record.type !== "image") {
-    imageDimensions.value = "";
-    return;
-  }
+watch(
+  imageUrl,
+  async (url) => {
+    if (!url) {
+      imageDimensions.value = "";
+      return;
+    }
 
-  const img = new Image();
-  img.onload = () => {
-    imageDimensions.value = `${img.width} x ${img.height}`;
-  };
-  img.onerror = (error) => {
-    console.error("图片尺寸获取失败", error);
-  };
-  img.src = imageUrl.value;
-};
-
-watch(() => props.record, loadImageDimensions, { immediate: true, deep: true });
+    const currentUrl = url;
+    try {
+      const { width, height } = await getImageDimensions(url);
+      if (imageUrl.value !== currentUrl) return;
+      imageDimensions.value = `${width} x ${height}`;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("图片尺寸获取失败", error);
+      if (imageUrl.value === currentUrl) {
+        imageDimensions.value = "";
+      }
+    }
+  },
+  { immediate: true }
+);
 
 // ===== 选中状态自动滚动 =====
 watch(
@@ -248,16 +254,15 @@ const singleImageUrl = computed(() => {
   padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   border-radius: 4px;
   position: relative;
+  border-left: 3px solid transparent;
 
   &:hover,
   &.selected {
     background-color: #f5f5f5;
-    transform: translateX(4px);
-    box-shadow: -4px 0 0 0 var(--n-color, #18a058),
-      0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left-color: var(--n-color, #18a058);
 
     .item-time {
       color: var(--n-color, #18a058);
@@ -267,7 +272,6 @@ const singleImageUrl = computed(() => {
     .item-index {
       color: var(--n-color, #18a058);
       font-weight: 600;
-      transform: scale(1.1);
     }
 
     .item-actions {
