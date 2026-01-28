@@ -139,14 +139,6 @@ const handleClickItem = async (record: ClipboardEntry) => {
     window.services.executeCopy([record]);
     return;
   }
-
-  if (record.type === "text") {
-    try {
-      await navigator.clipboard.writeText(record.value as string);
-    } catch (error) {
-      console.error("复制文本失败", error);
-    }
-  }
 };
 
 const handleAddFavorite = async (data: {
