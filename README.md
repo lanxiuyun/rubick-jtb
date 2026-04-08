@@ -1,3 +1,6 @@
+# 已弃用
+新剪贴板软件：https://github.com/lanxiuyun/paste-library
+
 ## Rubick 剪贴板插件
 
 ![demo](./.readme/image.png)
